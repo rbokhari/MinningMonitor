@@ -1,0 +1,586 @@
+.chart-line {
+    .ct-grid {
+        stroke-dasharray: 0;
+        stroke: rgba(256, 256, 256, 0.5);
+    }
+
+    .ct-point {
+        stroke-width: 0;
+    }
+
+    .ct-line {
+        stroke: #FFF;
+        stroke-width: 3px;
+    }
+}
+
+.chart-shadow {
+    transition: all 0.3s ease-in-out;
+    filter: drop-shadow(0px 5px 2px rgba(43,43,43,0.15));
+}
+
+.card {
+    &-blue,
+    &-green,
+    &-red,
+    &-yellow {
+        position: relative;
+        overflow: hidden;
+
+        &:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: linear-gradient(#ffffff1c 2px, transparent 2px), linear-gradient(90deg, #ffffff0f 2px, transparent 2px), linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+        }
+
+        .card-block,
+        .card-block-big,
+        .card-block-small,
+        .card-body,
+        .card-footer,
+        .card-header {
+            position: relative;
+            z-index: 5;
+        }
+    }
+
+    &-red {
+        &::after {
+            background-color: transparentize($danger-color,0.20);
+        }
+    }
+
+    &-blue {
+        &::after {
+            background-color: transparentize($primary-color,0.20);
+        }
+    }
+
+    &-green {
+        &::after {
+            background-color: transparentize($success-color,0.20);
+        }
+    }
+
+    &-yellow {
+        &::after {
+            background-color: transparentize($warning-color,0.20);
+        }
+    }
+}
+
+.site-visits-card {
+    overflow: hidden;
+    position: relative;
+
+    &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background: transparentize($primary-color,0.9);
+        background-image: linear-gradient(#ffffff1c 2px, transparent 2px), linear-gradient(90deg, #ffffff0f 2px, transparent 2px), linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+        background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+        background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+    }
+
+    .card-block,
+    .card-header,
+    .chart-shadow {
+        z-index: 5;
+    }
+
+    .radial-bar-primary.radial-bar-40 {
+        background-image: linear-gradient(90deg, lighten($primary-color,30%) 50%, transparent 50%, transparent), linear-gradient(234deg, #4fc3f7 50%, lighten($primary-color,30%) 50%, lighten($primary-color,30%));
+
+        &:after {
+            box-shadow: 0 0 0 5px #fff;
+        }
+    }
+
+    .caption {
+        position: absolute;
+        top: 15px;
+        left: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+
+        &.up {
+            background-color: lighten($primary-color,30%);
+        }
+
+        &.down {
+            background-color: $primary-color;
+        }
+    }
+}
+
+.activity-cir-card {
+    &:after {
+        background-color: #fff;
+    }
+
+    .card-block {
+        padding-top: 0;
+    }
+
+    .activity-cir-chart {
+        position: relative;
+        margin: 0 auto;
+
+        .chart-cont {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+    }
+
+    .ct-series-a .ct-slice-donut {
+        stroke: $primary-color;
+    }
+
+    .ct-series-b path {
+        stroke: #ebebeb;
+    }
+}
+
+.web-num-card {
+    .card-block {
+        position: relative;
+
+        &:after,
+        &:before {
+            content: "";
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            right: -50px;
+        }
+
+        &:after {
+            width: 85px;
+            height: 85px;
+            bottom: 50px;
+        }
+
+        &:before {
+            width: 130px;
+            height: 130px;
+            bottom: -50px;
+        }
+    }
+}
+
+.sell-btc-card {
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+
+    .card-block,
+    .card-body,
+    .card-header {
+        position: relative;
+        z-index: 5;
+    }
+
+    &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background-image: linear-gradient(#ffffff1c 2px, transparent 2px), linear-gradient(90deg, #ffffff0f 2px, transparent 2px), linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px);
+        background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+        background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+        background-color: $warning-color;
+    }
+
+    .card-block {
+        padding-top: 0;
+    }
+
+    .sell-btc-chart {
+        position: relative;
+        margin: 0 auto;
+
+        .chart-icon {
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 48px;
+        }
+
+        .ct-series-a .ct-slice-donut {
+            stroke: darken($warning-color,15%);
+        }
+
+        .ct-series-b path {
+            stroke: #ebebeb;
+        }
+    }
+}
+
+.table-card {
+    .card-block {
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: 0;
+
+        .table {
+            > thead > tr > th {
+                border-top: 0;
+            }
+
+            tr {
+                td,
+                th {
+                    &:first-child {
+                        padding-left: 20px;
+                    }
+
+                    &:last-child {
+                        padding-right: 20px;
+                    }
+                }
+            }
+
+            &.without-header {
+                tr {
+                    &:first-child {
+                        td {
+                            border-top: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.coin-market-card {
+    .table {
+        .text-left {
+            i {
+                width: 20px;
+                margin-right: 15px;
+                font-size: 18px;
+                text-align: center;
+            }
+        }
+    }
+}
+
+.instant-trading-card {
+    .form-group {
+        margin-bottom: 0;
+
+        .form-control {
+            font-weight: 600;
+        }
+    }
+
+    .sap-div {
+        position: relative;
+
+        &:after {
+            content: '';
+            background: $theme-border;
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            height: 1px;
+            z-index: 1;
+        }
+
+        i {
+            color: #fff;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transform: rotate(90deg);
+            text-align: center;
+            padding: 10px 0;
+            margin: 10px auto;
+            position: relative;
+            display: block;
+            z-index: 3;
+        }
+    }
+}
+
+.recent-operations-card {
+    .operation-icon {
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        padding: 0;
+        font-size: 18px;
+        color: #fff;
+        border-radius: 2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.to-do-list {
+    padding: 15px 0;
+    border-bottom: 1px solid $theme-border;
+    position: relative;
+
+    i {
+        color: #ccc;
+        font-size: 17px;
+        opacity: 0;
+        position: absolute;
+        right: 7px;
+        top: 20px;
+    }
+
+    &:first-child {
+        padding-top: 0;
+    }
+    &:last-child {
+        border: none;
+        padding-bottom: 0;
+    }
+
+    &:hover i {
+        opacity: 1;
+        transition: opacity ease-in 0.3s;
+    }
+
+    p {
+        display: inline-block;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    .checkbox-fade {
+        .cr {
+            top: 5px;
+            border-radius: 5px;
+
+            + span {
+                margin-left: 45px;
+                position: relative;
+                display: block;
+            }
+        }
+    }
+}
+
+.to-do-label {
+    .checkbox-fade {
+        display: block;
+
+        .delete_todo {
+            float: right;
+            font-size: 24px;
+            color: #ccc;
+        }
+    }
+
+    .check-task {
+        display: block;
+    }
+
+    i {
+        cursor: pointer;
+    }
+}
+
+.done-task .captions,
+.done-task span {
+    color: #919aa3;
+    text-decoration: line-through;
+}
+
+.latest-rel-card {
+    img {
+        border-radius: 4px;
+        margin: 15px 0;
+    }
+}
+
+.schedule-block {
+    border-left: 1px solid $theme-border;
+    margin-left: 20px;
+
+    .schedule-list {
+        position: relative;
+        padding-bottom: 30px;
+        padding-left: 35px;
+
+        +.schedule-list {
+            padding-top: 30px;
+            border-top: 1px solid $theme-border;
+
+            .schedule-image {
+                top: 30px;
+            }
+        }
+
+        .schedule-image {
+            width: 40px;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: -20px;
+        }
+        &:last-child{
+            padding-bottom: 5px;
+        }
+    }
+}
+
+.amount-close-card {
+    .progress {
+        height: 6px;
+        margin-bottom: 30px;
+    }
+}
+
+.proj-t-card {
+    position: relative;
+    overflow: hidden;
+
+    .pt-badge {
+        color: #fff;
+        margin-bottom: 0;
+        display: inline-block;
+        padding: 60px 50px 20px 20px;
+        border-radius: 50%;
+        position: absolute;
+        top: -45px;
+        right: -35px;
+        transition: all 0.3s ease-in-out;
+        box-shadow: -1px 2px 5px -1px rgba(62, 57, 107, 0.46);
+    }
+
+    &:hover {
+        .pt-badge {
+            padding: 65px 55px 30px 30px;
+        }
+    }
+}
+
+.stat-rev-card {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding-top: 50px;
+
+    .rev-icon {
+        width: 150px;
+        height: 150px;
+        position: absolute;
+        top: -100px;
+        left: 50%;
+        border-radius: 50%;
+        padding: 20px;
+        transform: translatex(-50%);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+
+        .ring-lg,
+        .ring-sm {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: inherit;
+            border-radius: 50%;
+            transform: scale(1);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .ring-lg {
+            opacity: 0.3;
+        }
+
+        .ring-sm {
+            opacity: 0.5;
+        }
+
+        i {
+            font-size: 18px;
+            // text-shadow: 0 9px 5px rgba(43, 43, 43, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    &:hover {
+        .rev-icon {
+            .ring-lg {
+                transform: scale(1.4);
+            }
+
+            .ring-sm {
+                transform: scale(1.2);
+            }
+        }
+    }
+}
+
+.stat-ecom-card {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 50px;
+
+    .eco-icon {
+        // text-shadow: 0 9px 5px rgba(43, 43, 43, 0.3);
+        font-size: 48px;
+    }
+
+    .stat-ecom-cart {
+        position: absolute;
+        bottom: 0;
+    }
+}
+
+.coin-price-card {
+    overflow: hidden;
+
+    .coin-title {
+        padding: 20px 30px;
+    }
+
+    .coin-icon {
+        background-color: #f5f5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+
+        i {
+            font-size: 30px;
+            // text-shadow: 0 4px 2px rgba(43, 43, 43, 0.3);
+        }
+    }
+}

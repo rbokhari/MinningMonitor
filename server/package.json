@@ -1,0 +1,38 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "ts": "tsc -w",
+    "server": "nodemon ./build/index.js",
+    "start": "node ./build/index.js",
+    "ts:watch": "tsc -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "compression": "^1.7.3",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "errorhandler": "^1.5.0",
+    "express": "^4.16.3",
+    "helmet": "^3.13.0",
+    "method-override": "^2.3.10",
+    "mongoose": "^5.2.1",
+    "morgan": "^1.9.0",
+    "q": "^1.5.1"
+  },
+  "devDependencies": {
+    "@types/mongodb": "^3.1.1",
+    "@types/mongoose": "^5.2.0",
+    "@types/node": "^10.5.2",
+    "@types/q": "^1.5.0",
+    "@types/body-parser": "^1.17.0",
+    "@types/compression": "^0.0.36",
+    "@types/cors": "^2.8.4",
+    "@types/express": "^4.16.0",
+    "@types/helmet": "^0.0.38"
+  }
+}
