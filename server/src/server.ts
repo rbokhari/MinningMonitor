@@ -7,7 +7,7 @@ import * as helmet from 'helmet';
 import * as cors from 'cors';
 
 import config from './config';
-import RigRouter from './router/RigRouter';
+import { RigRouter, ActionRouter } from './router';
 
 class Server {
 
@@ -45,7 +45,6 @@ class Server {
         this.app.use(compression());
         this.app.use(cors());
 
-
     }
 
     public routes(): void {
@@ -54,9 +53,9 @@ class Server {
 
         this.app.use('/', router);
         this.app.use('/api/v1/rigs', RigRouter);
+        this.app.use('/api/v1/actions', ActionRouter);
 
     }
-
 }
 
 export default new Server().app;

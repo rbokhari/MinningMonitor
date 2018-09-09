@@ -24,7 +24,7 @@ class Api {
             'CompanyId': 1 //localStorage.getItem('companyId')
         };
         const params = Object.assign( {}, data );
-        return fetch(`${API_URL}/${url}`, {
+        return fetch(`${API_URL}${url}`, {
             method: 'post', 
             headers: headers,
             body: JSON.stringify(data)

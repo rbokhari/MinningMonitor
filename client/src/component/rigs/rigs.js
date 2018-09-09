@@ -73,7 +73,6 @@ class Rigs extends React.Component {
             });
     }
 
-
     getData() {
         Api.get('rigs')
         .then(res => res.json())
@@ -95,6 +94,18 @@ class Rigs extends React.Component {
         .catch(err => console.error('fetch error', err));
     }
 
+    setAction(rig) {
+        const action = {
+            rig: rig._id,
+            action: 1,
+            status: 1
+        };
+        
+        Api.post('actions', action)
+            .then(res => console.info('action', res))
+            .catch(err => console.error('action error', err));
+    }
+
     calculateTime(d1) {
         const result = Math.floor((new Date() - new Date(d1))/1000/60);
         return result;
@@ -106,9 +117,11 @@ class Rigs extends React.Component {
         // const mins = secs / 60;
         //return `${hours.toFixed(0)}h:${mins.toFixed(0)}m`
         // return moment(secs, 'ss').format('h:mm:ss');
-        return moment().startOf('day')
+        //return secs;
+        return moment() //(secs * 1000)
+                .startOf('day')
                 .seconds(secs)
-                .format('H[h] m[m] s[s]');
+                .format('d[d] H[h] m[m] s[s]');
     }
 
     formatMinerUpTime(t) {
@@ -125,15 +138,13 @@ class Rigs extends React.Component {
         day = Math.floor(hour / 24);
         hour = hour % 24;
         return `
-            ${isNaN(day) ? 0 : day}d 
+            ${isNaN(day) ? 0 : day}d
             ${isNaN(hour) ? 0 : hour}h 
             ${isNaN(minute) ? 0 : minute}m 
             ${isNaN(seconds) ? 0 : seconds}s
         `;
 
     }
-
-
 
     render() {
         return (
@@ -212,6 +223,7 @@ class Rigs extends React.Component {
                                                     <table className="table table-">
                                                         <thead>
                                                             <tr>
+                                                                <th style={{width:'10pt'}}></th>
                                                                 <th>Rig Name</th>
                                                                 <th>Group</th>
                                                                 <th>Hash Power</th>
@@ -226,16 +238,25 @@ class Rigs extends React.Component {
                                                                 // className={rig.minutes > 125 ? 'alert alert-danger' : 'alert alert-success'}
                                                                 >
                                                                 <td>
+                                                                    <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'warning' : 'success'}>
+                                                                            <div>
+                                                                                <i className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
+                                                                            </div>
+                                                                            <div>
+                                                                                {rig.minutes > 2 ? 'offline' : 'online'}
+                                                                            </div>
+                                                                        </MappleToolTip>
+                                                                </td>
+                                                                <td>
+                                                                    <div>
                                                                     {rig.isNameEdit && 
                                                                         <form onSubmit={this.handleSubmit}>
                                                                             <input type="text" value={rig.computerName} onChange={this.handleNameChange} />
                                                                         </form>
                                                                     }
-                                                                    
                                                                     {!rig.isNameEdit && <a href="#" onClick={this.setEdit.bind(this,i)}>
                                                                         <MappleToolTip float={true} direction={'bottom'} mappleType={'warning'}>
                                                                             <div>
-                                                                                <i className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
                                                                                 {rig.computerName}
                                                                             </div>
                                                                             <div>
@@ -247,6 +268,7 @@ class Rigs extends React.Component {
                                                                             </div>
                                                                         </MappleToolTip>
                                                                     </a>}
+                                                                    </div>
                                                                 </td>
                                                                 <td></td>
                                                                 <td>
@@ -283,20 +305,23 @@ class Rigs extends React.Component {
                                                                     <MappleToolTip float={true} direction={'top'} mappleType={'success'}>
                                                                         <div>
                                                                             {/* {moment(rig.updatedAt).format('MMM D YYYY h:mm:ss')} */}
-                                                                            {this.formatMinerUpTime(rig.rigUpTime)}
+                                                                            {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
+                                                                            {rig.isOnline == 0 && '--'}
                                                                         </div>
                                                                         <div>
                                                                             <span>
                                                                                 System Up Time : <br />
-                                                                                Miner Up Time : {this.formatMinerUpTime(rig.rigUpTime)} <br/>
+                                                                                Miner Up Time : {rig.isOnline == 0 && '--'} {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)} <br/>
                                                                                 {/* Last Seen Seconds : {((new Date() - new Date(rig.updatedAt))/1000).toFixed(0)}&nbsp;sec<br /> */}
-                                                                                Last Seen : {this.formatLastSeen(rig.updatedAt)}
+                                                                                Last Seen : {this.formatLastSeen(rig.updatedAt)}<br />
+                                                                                {/* {rig.updatedAt} */}
                                                                             </span>
                                                                         </div>
                                                                     </MappleToolTip>
                                                                 </td>
                                                                 <td>
                                                                     {/* {moment(rig.updatedAt).format('MMM D YYYY, h:mm:ss a')} */}
+                                                                    <i className="fa fa-lock" onClick={this.setAction.bind(this, rig)}></i>
                                                                 </td>
                                                             </tr>)
                                                             )}

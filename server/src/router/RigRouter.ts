@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Rig from '../models/rig';
+import Action from '../models/action';
 
 export class RigRouter {
     router: Router;
@@ -100,7 +101,7 @@ export class RigRouter {
             osName,
             ip,
             kernelName,
-            computerName,
+            //computerName,
             totalHashrate,
             singleHashrate,
             shares,
@@ -112,14 +113,22 @@ export class RigRouter {
             updatedAt,
             rigUpTime
         };
-        console.info(rig);
         Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, model) {
             if (err) res.status(400).json(err);
             
+            Action.find({rig: id})
+                .then(data => {
+                    const rigReturn = {...model, actions: data};
+                    console.log('rig return', rigReturn);
+                    res.status(200).json({
+                        rigReturn
+                    });
+                })
+                .catch(err => {
+                    res.status(400).json(err);
+                });
+
             console.info('update rig data ', model);
-            res.status(200).json({
-                model
-            });
         });
     }
 
