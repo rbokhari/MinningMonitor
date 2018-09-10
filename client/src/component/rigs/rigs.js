@@ -124,6 +124,27 @@ class Rigs extends React.Component {
                 .format('d[d] H[h] m[m] s[s]');
     }
 
+    formatLastSeen2(t) {
+        // return moment().startOf('day')
+        //         .seconds(t*60)
+        //         .format('H[h] m[m] s[s]');
+        var milliseconds = new Date() - new Date(t);
+        var day, hour, minute, seconds;
+        seconds = Math.floor(milliseconds / 1000);
+        minute = Math.floor(seconds / 60);
+        seconds = seconds % 60;
+        hour = Math.floor(minute / 60);
+        minute = minute % 60;
+        day = Math.floor(hour / 24);
+        hour = hour % 24;
+        return `
+            ${isNaN(day) ? '' : day}d
+            ${isNaN(hour) ? '' : hour}h 
+            ${isNaN(minute) ? 0 : minute}m 
+            ${isNaN(seconds) ? 0 : seconds}s
+        `;
+    }
+
     formatMinerUpTime(t) {
         // return moment().startOf('day')
         //         .seconds(t*60)
@@ -143,7 +164,6 @@ class Rigs extends React.Component {
             ${isNaN(minute) ? 0 : minute}m 
             ${isNaN(seconds) ? 0 : seconds}s
         `;
-
     }
 
     render() {
@@ -238,14 +258,14 @@ class Rigs extends React.Component {
                                                                 // className={rig.minutes > 125 ? 'alert alert-danger' : 'alert alert-success'}
                                                                 >
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'warning' : 'success'}>
-                                                                            <div>
-                                                                                <i className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
-                                                                            </div>
-                                                                            <div>
-                                                                                {rig.minutes > 2 ? 'offline' : 'online'}
-                                                                            </div>
-                                                                        </MappleToolTip>
+                                                                    <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'info' : 'info'}>
+                                                                        <div>
+                                                                            <i className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
+                                                                        </div>
+                                                                        <div>
+                                                                            {rig.minutes > 2 ? 'offline' : 'online'}
+                                                                        </div>
+                                                                    </MappleToolTip>
                                                                 </td>
                                                                 <td>
                                                                     <div>
@@ -255,16 +275,16 @@ class Rigs extends React.Component {
                                                                         </form>
                                                                     }
                                                                     {!rig.isNameEdit && <a href="#" onClick={this.setEdit.bind(this,i)}>
-                                                                        <MappleToolTip float={true} direction={'bottom'} mappleType={'warning'}>
+                                                                        <MappleToolTip float={true} direction={'bottom'} mappleType={'info'}>
                                                                             <div>
                                                                                 {rig.computerName}
                                                                             </div>
                                                                             <div>
-                                                                                OS Version = <br/>
-                                                                                Rig Id = <br/>
-                                                                                Lan IP = {rig.ip}<br/>
-                                                                                Public IP = <br/> 
-                                                                                Gpu =
+                                                                                OS Version : <br/>
+                                                                                Rig Id : <br/>
+                                                                                Lan IP : {rig.ip}<br/>
+                                                                                Public IP : <br/> 
+                                                                                Gpu :
                                                                             </div>
                                                                         </MappleToolTip>
                                                                     </a>}
@@ -272,7 +292,7 @@ class Rigs extends React.Component {
                                                                 </td>
                                                                 <td></td>
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'success'}>
+                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             <label className=''>{(rig.totalHashrate/1).toFixed(2)} MH/s</label>
                                                                         </div>
@@ -282,7 +302,7 @@ class Rigs extends React.Component {
                                                                     </MappleToolTip>
                                                                 </td>
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'success'}>
+                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             {Math.max(...rig.temperatures)}℃<br/>
                                                                             {Math.max(...rig.fanSpeeds)}%<br/>
@@ -302,7 +322,7 @@ class Rigs extends React.Component {
                                                                     {rig.fanSpeeds.map((fan,j)=> (<label key={(i+j+1)*201}>{fan}%&nbsp;&nbsp;</label>))}<br/> */}
                                                                 </td>
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'success'}>
+                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             {/* {moment(rig.updatedAt).format('MMM D YYYY h:mm:ss')} */}
                                                                             {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
@@ -313,7 +333,7 @@ class Rigs extends React.Component {
                                                                                 System Up Time : <br />
                                                                                 Miner Up Time : {rig.isOnline == 0 && '--'} {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)} <br/>
                                                                                 {/* Last Seen Seconds : {((new Date() - new Date(rig.updatedAt))/1000).toFixed(0)}&nbsp;sec<br /> */}
-                                                                                Last Seen : {this.formatLastSeen(rig.updatedAt)}<br />
+                                                                                Last Seen : {this.formatLastSeen2(rig.updatedAt)}<br />
                                                                                 {/* {rig.updatedAt} */}
                                                                             </span>
                                                                         </div>

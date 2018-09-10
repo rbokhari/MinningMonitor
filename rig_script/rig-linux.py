@@ -3,6 +3,7 @@ import socket
 import statistics
 import time
 import requests
+import os
 #import httplib
 
 # from firebase import firebase
@@ -133,7 +134,6 @@ def init():
         print('-----------------START------------------')
         print('Number of active cards: ' + str(cards))
         print('GPU temp: ' + str(temp))
-        print(temps)
         #print('GPU s : ' + gpus)
         print('Fan speed (%): ' + str(fan))
         print('Miner uptime is ' + miner_uptime + ' min')
@@ -170,26 +170,43 @@ def init():
             #print('Rig ping at {}'.format(datetime.now()))
             #rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
-            response = requests.put(uri + '/' + id, json=rig)
-            if response.status_code != requests.codes.ok: # 201:
-                print('error occured update', response.status_code)
+            try:
+                response = requests.put(uri + '/' + id, json=rig)
+                if response.status_code != requests.codes.ok: # 201:
+                    print('error occured update', response.status_code)
+                #if response.status_code == requests.codes.ok: # 201:
+                    #print('Updated Rig. ID: {}'.format(response.json()))
+                result = response.json()
+                #print(result)
+                comp_name = result['rigReturn']['computer']
+                save_name_to_file(comp_name)
+                actions = result['rigReturn']['action']
+                print(actions)
+                if len(actions) > 0:
+                    action_id = actions[0]['action']
+                    if action_id == 1:
+                        execute_sh()
+            except requests.exceptions.ConnectionError as e:
+                print('Connection failed.')
                 #raise ApiError('POST /tasks/ {}'.format(result.status_code))
-            print('Created Rig. ID: {}'.format(response.json()))
 
         else:
             #result = register_rig()
             rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
-            response = requests.post(uri, json=rig)
-            if response.status_code != requests.codes.created: # 200:
-                print('error occured create', response.status_code)
+            try:
+                response = requests.post(uri, json=rig)
+                if response.status_code != requests.codes.created: # 200:
+                    print('error occured create', response.status_code)
+                print('Created Rig. ID: {}'.format(response.json()))
+                result = response.json()
+                print('-------')
+                print(result['data'])
+                save_id_to_file(result['data']["_id"])
+            except requests.exceptions.ConnectionError as e:
+                print('Connection failed.')
                 #raise ApiError('POST /tasks/ {}'.format(result.status_code))
-            print('Created Rig. ID: {}'.format(response.json()))
-            result = response.json()
-            print('-------')
-            print(result['data'])
             #result = firebase.post('rigs', { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate })
             #print('Rig registered at {}'.format(datetime.now()))
-            save_id_to_file(result['data']["_id"])
 
         time.sleep(30)
         #condition = False
@@ -218,6 +235,11 @@ def save_id_to_file(id):
     f.write(id)
     f.close()
 
+def save_name_to_file(name):
+    f = open("name.txt", "w+")
+    f.write(name)
+    f.close()
+
 def read_id_from_file():
     f = open("id.txt", "r")
     id = f.read()
@@ -229,7 +251,9 @@ def read_email_from_file():
     email = f.read()
     f.close()
     return email
-    
+
+def execute_sh():
+    os.system('sudo ./force_reboot.sh')
         
 if __name__ == '__main__':
     init()

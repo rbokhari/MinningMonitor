@@ -113,12 +113,18 @@ export class RigRouter {
             updatedAt,
             rigUpTime
         };
-        Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, model) {
+        Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, updRig) {
             if (err) res.status(400).json(err);
             
+            //const _rig: Rig = updatedRig;
             Action.find({rig: id})
                 .then(data => {
-                    const rigReturn = {...model, actions: data};
+                    //const rigReturn = {...model, actions: data};
+                    const rigReturn = {
+                        rigId: updRig._id,
+                        computer: updRig['computerName'],
+                        action: data
+                    };
                     console.log('rig return', rigReturn);
                     res.status(200).json({
                         rigReturn
@@ -128,7 +134,7 @@ export class RigRouter {
                     res.status(400).json(err);
                 });
 
-            console.info('update rig data ', model);
+            console.info('update rig data ', updRig);
         });
     }
 
