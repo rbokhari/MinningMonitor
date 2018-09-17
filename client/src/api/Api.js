@@ -61,6 +61,19 @@ class Api {
         });
     }
 
+    static delete(url, data) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'authorization': localStorage.getItem('token')
+        };
+        const params = Object.assign( {}, data );
+        return fetch(`${API_URL}${url}`, {
+            method: 'delete',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+    }
+
 }
 
 export default Api;

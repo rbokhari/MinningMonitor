@@ -7,7 +7,7 @@ import registerServiceWorker from './registerServiceWorker';
 require('bootstrap/dist/css/bootstrap.min.css');
 require('./assets/pages/waves/css/waves.min.css');
 require('./assets/icon/feather/css/feather.css');
-require('./assets/css/font-awesome.min.css');
+require('./assets/css/font-awesome-n.min.css');
 //require('/assets/css/font-awesome-n.min.css');
 require('./assets/pages/chart/radial/css/radial.css');
 require('./assets/css/style.css');

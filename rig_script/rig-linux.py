@@ -11,7 +11,8 @@ from datetime import datetime
 from pathlib import Path
 import platform
 
-uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+#uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+uri = "http://mmosapi.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
 
 # firebase = firebase.FirebaseApplication('https://genesuspool.firebaseio.com/')
@@ -35,7 +36,8 @@ def get_data():
         try:
             sock.connect(server_address)
         except Exception as e:
-            print('Miner socket ' + str(miner_ip) + ':' + str(miner_port) + ' is closed')
+            #print('Miner socket ' + str(miner_ip) + ':' + str(miner_port) + ' is closed')
+            print('Miner is closed, retrying !!!')
             return []
         request = '{\"id\":0,\"jsonrpc\":\"2.0\",\"method\":\"miner_getstat1\",\"psw\":\"''\"}'
         request = request.encode()
@@ -120,42 +122,44 @@ def init():
         #{"result": ["7.3", "19", "16212;7;0", "16212", "0;0;0", "0", "74;30", "us1.ethermine.org:4444", "0;0;0;7"]}
         #u'result': [u'10.6 - ETH', u'76', u'25940;31;0', u'25940', u'0;0;0', u'off', u'45;80', u'eu1.ethermine.org:4444', u'0;0;0;0']}
         #{'id': 0, 'result': ['11.9 - ETH', '4332', '54611;3461;1', '26238;28373', '0;0;0', 'off;off', '39;80;44;80', 'eu1.ethermine.org:4444', '0;0;0;0'], 'error': None}
-        all = data['result'][6].split(';')
-        gpus = data['result'][3].split(';')
-        temps = all[::2]
-        fans = all[1::2]
-        total_shares = int(data['result'][2].split(';')[1])
-        invalid_shares = int(data['result'][8].split(';')[0])
-        miner_uptime = data['result'][1]
-        cards = len(temps)
-        #temp = ';'.join(temps) #str(temps)
-        #fan = ';'.join(fans) #str(fans)
+        isMinerRunning = (len(data) > 0)
+        if (isMinerRunning):
+            all = data['result'][6].split(';')
+            gpus = data['result'][3].split(';')
+            temps = all[::2]
+            fans = all[1::2]
+            total_shares = int(data['result'][2].split(';')[1])
+            invalid_shares = int(data['result'][8].split(';')[0])
+            miner_uptime = data['result'][1]
+            cards = len(temps)
+            #temp = ';'.join(temps) #str(temps)
+            #fan = ';'.join(fans) #str(fans)
 
-        print('-----------------START------------------')
-        print('Number of active cards: ' + str(cards))
-        print('GPU temp: ' + str(temp))
-        #print('GPU s : ' + gpus)
-        print('Fan speed (%): ' + str(fan))
-        print('Miner uptime is ' + miner_uptime + ' min')
-        # print('Total Shares : ' + str(total_shares) + '')
-        # print('Invalid Shares : ' + str(invalid_shares) + '')
-        print('Calculating Hashrate ...')
-        
-        hashrates = []
-        i = 0
-        #logger.info('Previous hashrate is %s ' % "{:,.2f}".format(previous_hashrate / 1000) + ' Mh/s')
-        #logger.info('Started calculating hashrate...')
-        for i in range(0, 5):
-            hashrates.append(float(avg_hashrate_1min()))
-            time.sleep(2)
-            i += 1
+            print('-----------------START------------------')
+            print('Number of active cards: ' + str(cards))
+            print('GPU temp: ' + str(temp))
+            #print('GPU s : ' + gpus)
+            print('Fan speed (%): ' + str(fan))
+            print('Miner uptime is ' + miner_uptime + ' min')
+            # print('Total Shares : ' + str(total_shares) + '')
+            # print('Invalid Shares : ' + str(invalid_shares) + '')
+            print('Calculating Hashrate ...')
+            
+            hashrates = []
+            i = 0
+            #logger.info('Previous hashrate is %s ' % "{:,.2f}".format(previous_hashrate / 1000) + ' Mh/s')
+            #logger.info('Started calculating hashrate...')
+            for i in range(0, 5):
+                hashrates.append(float(avg_hashrate_1min()))
+                time.sleep(2)
+                i += 1
 
-        current_hashrate = statistics.mean(hashrates)
-        hashrate = current_hashrate / 1000
+            current_hashrate = statistics.mean(hashrates)
+            hashrate = current_hashrate / 1000
 
-        print('Current Hashrate ' + str(hashrates[4] / 1000) + ' Mh/s')
-        print('Average Hashrate ' + str(hashrate) + ' Mh/s')
-        print('-----------------END--------------------')
+            print('Current Hashrate ' + str(hashrates[4] / 1000) + ' Mh/s')
+            print('Average Hashrate ' + str(hashrate) + ' Mh/s')
+            print('-----------------END--------------------')
 
         lan_ip = get_lan_ip()
         id_file = Path("id.txt")
@@ -169,7 +173,10 @@ def init():
             #result = firebase.put('rigs', id, { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': str(temp), 'fan': str(fan), 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate, 'gpus': gpus })
             #print('Rig ping at {}'.format(datetime.now()))
             #rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
-            rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+            if isMinerRunning:
+                rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+            else:
+                rig = { 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': [], 'fans': [], 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
             try:
                 response = requests.put(uri + '/' + id, json=rig)
                 if response.status_code != requests.codes.ok: # 201:
@@ -177,7 +184,7 @@ def init():
                 #if response.status_code == requests.codes.ok: # 201:
                     #print('Updated Rig. ID: {}'.format(response.json()))
                 result = response.json()
-                #print(result)
+                print(result)
                 comp_name = result['rigReturn']['computer']
                 save_name_to_file(comp_name)
                 actions = result['rigReturn']['action']
@@ -208,7 +215,7 @@ def init():
             #result = firebase.post('rigs', { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate })
             #print('Rig registered at {}'.format(datetime.now()))
 
-        time.sleep(30)
+        time.sleep(15)
         #condition = False
 
 # online registering

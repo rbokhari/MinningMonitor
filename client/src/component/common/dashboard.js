@@ -29,7 +29,7 @@ const Dashboard = () => (
                             <div className="col-xl-3 col-md-6">
                                 <div className="card o-hidden bg-c-blue web-num-card">
                                     <div className="card-block text-white">
-                                        <h5 className="m-t-15">Total Hash power</h5>
+                                        <h5 className="m-t-15">Total Hashrate</h5>
                                         <h3 className="m-b-15">53,120</h3>
                                     </div>
                                 </div>
@@ -47,8 +47,8 @@ const Dashboard = () => (
                             <div className="col-xl-3 col-md-6">
                                 <div className="card o-hidden bg-c-red web-num-card">
                                     <div className="card-block text-white">
-                                        <h5 className="m-t-15">Total Rigs</h5>
-                                        <h3 className="m-b-15">40</h3>
+                                        <h5 className="m-t-15">Total Miners</h5>
+                                        <h3 className="m-b-15">1 / 40</h3>
                                     </div>
                                 </div>
                             </div>

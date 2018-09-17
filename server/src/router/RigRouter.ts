@@ -18,7 +18,7 @@ export class RigRouter {
                 });
             })
             .catch(err => {
-                res.status(400).json(err);
+                res.status(500).json(err);
             });
     }
     
@@ -31,11 +31,18 @@ export class RigRouter {
                 });
             })
             .catch(err => {
-                res.status(400).json(err);
+                res.status(500).json(err);
             });
     }
 
     public CreateRig(req: Request, res: Response): void {
+        if (!req.body.content) {
+            res.status(400).send({
+                message: "Note content can not be empty"
+            });
+            return;
+        }
+
         const cards: Number = req.body.cards;
         const osName: string = req.body.osName;
         const email: string = req.body.email;
@@ -75,7 +82,7 @@ export class RigRouter {
             })
             .catch(err => {
                 console.log('error occured by creating rig', err);
-                res.status(400).json({ err });
+                res.status(500).json({ err });
             });
     }
 
@@ -154,14 +161,30 @@ export class RigRouter {
 
     public DeleteRig(req: Request, res: Response): void {
         const id: string = req.params.id;
+        console.log("delete rig id ", id);
         Rig.findByIdAndRemove(id)
-            .then(data => {
-                res.status(200).json({
-                    data
-                });
+            .then(rig => {
+                // res.status(200).json({
+                //     data
+                // });
+                if(!rig) {
+                    return res.status(404).send({
+                        message: "Miner not found with id " + id
+                    });
+                }
+                res.send({message: "MIner deleted successfully!"});
             })
             .catch(err => {
-                res.status(400).json(err);
+                if(err.kind === 'ObjectId' || err.name === 'NotFound') {
+                    return res.status(404).send({
+                        message: "Miner not found with id " + id
+                    });                
+                }
+                return res.status(500).send({
+                    message: "Could not delete Miner with id " + id
+                });
+                // console.error('delete rig error :', err);
+                // res.status(400).json(err);
             });
     }
 

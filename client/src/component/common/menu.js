@@ -16,9 +16,9 @@ const Menu = () => (
                 </ul>
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
-                        <NavLink to="/rigs" className="waves-effect waves-dark">
+                        <NavLink to="/rigs" className="waves-effect waves-dark" activeClassName="active">
                             <span className="pcoded-micon"><i className="feather icon-power"></i></span>
-                            <span>Rig Online</span>
+                            <span>Miners Online</span>
                         </NavLink>
                     </li>
                 </ul>
@@ -26,7 +26,7 @@ const Menu = () => (
                     <li className="">
                         <NavLink to="/groups" className="waves-effect waves-dark">
                             <span className="pcoded-micon"><i className="feather icon-user"></i></span>
-                            <span>Rig Group</span>
+                            <span>Miners Group</span>
                         </NavLink>
                     </li>
                 </ul>

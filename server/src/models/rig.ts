@@ -30,27 +30,27 @@ export const RigSchema: Schema = new Schema({
     osName: {
         type: String,
         default: '',
-        required: true,
+        //required: true,
     },
     kernelName: {
         type: String,
         default: '',
-        required: true,
+        //required: true,
     },
     computerName: {
         type: String,
         default: '',
-        required: true,
+        //required: true,
     },
     totalHashrate: {
         type: String,
         default: '',
-        required: true,
+        //required: true,
     },
     status: {
         type: String,
         default: '',
-        required: true,
+        //required: true,
     },
     singleHashrate: [Number],
     temperatures: [Number],

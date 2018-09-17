@@ -5,7 +5,7 @@ const Header = () => (
         <div className="navbar-wrapper">
             <div className="navbar-logo">
                 <a href="index.html">
-                    {/* <img className="img-fluid" src="/static/images/logo.png" alt="Theme-Logo" /> */}
+                    <img className="img-fluid" src="static/media/logo.jpeg" alt="Theme-Logo" />
                 </a>
                 <a className="mobile-menu" id="mobile-collapse" href="#!">
                     <i className="feather icon-menu"></i>
