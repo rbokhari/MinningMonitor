@@ -7,7 +7,7 @@ import { Rigs } from './component/rigs';
 const Routes = () => (
     <Switch>
         <Route path="/" exact activeClassName='active' component={Dashboard} />
-        <Route path="/rigs" component={Rigs} />
+        <Route path="/miners" component={Rigs} />
         <Route path="*" component={NotFound} />
     </Switch>
 );

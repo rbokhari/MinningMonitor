@@ -75,6 +75,9 @@ export const RigSchema: Schema = new Schema({
     },
     startTime: {
         type: Date
+    },
+    notes: {
+        type: String
     }
 });
 

@@ -9,9 +9,9 @@ const RigDeleteModal = ({isOpen, onHandleSubmit, onHandleClose}) => {
             <form onSubmit={onHandleSubmit}>
                 <ModalHeader>Miner Delete</ModalHeader>
                 <ModalBody>
-                    <h4>
-                        Are you sure to delete this miner ?
-                    </h4>
+                    <p>
+                        Are you sure you want to delete this miner ?
+                    </p>
                     
                 </ModalBody>
                 <ModalFooter>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import NavItem from './navItem';
 
 const Menu = () => (
     <nav className="pcoded-navbar">
@@ -7,6 +8,12 @@ const Menu = () => (
             <div className="pcoded-inner-navbar main-menu">
             <div className="pcoded-navigation-label" menu-title-theme="theme6">Main Menu</div>
                 <ul className="pcoded-item pcoded-left-item">
+                    {/* <NavItem to="/" onlyActiveOnIndex index={true}>
+						<i className="menu-icon fa fa-tachometer"></i>
+						<span className="menu-text">
+                        <span>Dashboard</span>
+						</span>					
+					</NavItem> */}
                     <li className="">
                         <NavLink to="/" className="">
                             <span className="pcoded-micon"><i className="feather icon-home"></i></span>
@@ -16,7 +23,7 @@ const Menu = () => (
                 </ul>
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
-                        <NavLink to="/rigs" className="waves-effect waves-dark" activeClassName="active">
+                        <NavLink to="/miners" className="waves-effect waves-dark" activeClassName="active">
                             <span className="pcoded-micon"><i className="feather icon-power"></i></span>
                             <span>Miners Online</span>
                         </NavLink>

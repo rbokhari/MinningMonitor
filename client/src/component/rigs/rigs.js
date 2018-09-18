@@ -7,6 +7,7 @@ import Api from '../../api/Api';
 import { Modal } from 'react-bootstrap';
 import RigEditModal from './rigEditModal';
 import RigDeleteModal from './rigDeleteModal';
+import RigNoteModal from './rigNoteModal';
 
 require('../../toastr.min.css');
 
@@ -22,6 +23,7 @@ class Rigs extends React.Component {
             rig: {},
             showModal: false,
             showDeleteModal: false,
+            showNoteModal: false,
             interval: 1000*30   // 30 seconds
         };
         this.getData = this.getData.bind(this);
@@ -35,6 +37,11 @@ class Rigs extends React.Component {
         this.handleDeleteModal = this.handleDeleteModal.bind(this);
         this.handleDeleteClose = this.handleDeleteClose.bind(this);
         this.handleDeleteSubmit = this.handleDeleteSubmit.bind(this);
+
+        this.handleNoteModal = this.handleNoteModal.bind(this);
+        this.handleNoteClose = this.handleNoteClose.bind(this);
+        this.handleNoteSubmit = this.handleNoteSubmit.bind(this);
+        this.handleNoteChange = this.handleNoteChange.bind(this);
         //this.setEdit = this.setEdit.bind(this);
     }
 
@@ -67,7 +74,6 @@ class Rigs extends React.Component {
     }
 
     handleNameChange(e) {
-        console.info('e', e.target.value);
         e.preventDefault();
         let { rigs, indexEdit } = this.state;
         rigs = rigs.map((rig,i) => {
@@ -114,10 +120,19 @@ class Rigs extends React.Component {
             .then(res => res.json())
             .then(data => {
                 const rigs = data.data
+                    // .sort((a,b) => {
+                    //     //a.computerName < b.computerName
+                    //     var x = a.computerName.toLowerCase();
+                    //     var y = b.computerName.toLowerCase();
+                    //     if (x < y) {return -1;}
+                    //     if (x > y) {return 1;}
+                    // })
                     .map(rig => {
                         return {
                             ...rig,
                             totalHashrate: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : rig.totalHashrate,
+                            maxTemp: 0,
+                            maxFan: 0,
                             isNameEdit: false,
                             minutes: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60),
                             isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : 1,
@@ -160,6 +175,42 @@ class Rigs extends React.Component {
     handleDeleteClose(e) {
         e.preventDefault();
         this.setState(prevState => ({showDeleteModal: false}));
+    }
+
+    handleNoteModal(rig) {
+        const rigClone = Object.assign({}, rig);
+        this.setState((prevState, props) => ({showNoteModal: true, rig: rigClone}));
+    }
+
+    handleNoteSubmit(e) {
+        e.preventDefault();
+        const { rig } = this.state;
+        console.info('rig', rig);
+        this.setState(prevState => ({showNoteModal: false}));
+        Api.put(`rigs/${rig._id}/note`, {'note': rig.notes})
+            .then(res => {
+                this.getData();
+                this.refs.container.success(
+                    "Success !",
+                    "Miner's Note added.", {
+                    timeOut: 1000,
+                    extendedTimeOut: 100
+                });
+                })
+            .catch(err => console.error('Delete Rig', err));
+    }
+
+    handleNoteChange(e) {
+        e.preventDefault();
+        const { rig } = this.state;
+        rig.notes = e.target.value;
+        this.setState({ rig: rig });
+    }
+
+
+    handleNoteClose(e) {
+        e.preventDefault();
+        this.setState(prevState => ({showNoteModal: false}));
     }
 
     setAction(rig) {
@@ -245,15 +296,24 @@ class Rigs extends React.Component {
         return total;
     }
 
+    styleMaxTemp(temps) {
+        if (typeof temps == undefined) return;
+        if (temps == null) return;
+        const max = Math.max(...temps);
+        if (max > 85 ) return (<p className="text-danger">{max}&nbsp;℃</p>)
+        else if (max > 75) return (<p className="text-warning">{max}&nbsp;℃</p>)
+        else return (<p>{max}&nbsp;℃</p>)
+    }
+
     render() {
-        const { showModal, showDeleteModal, rigs, rig } = this.state;
-        let container;
+        const { showModal, showDeleteModal, showNoteModal, rigs, rig } = this.state;
         return (<div>
             <div className="pcoded-content">
                 <ToastContainer ref="container"
                         className="toast-top-right" />
                 <RigEditModal isOpen={showModal} rig={rig} onHandleClose={this.handleModalClose} onHandleChange={this.handleChange} onHandleSubmit={this.handleSubmit}  />
                 <RigDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
+                <RigNoteModal isOpen={showNoteModal} rig={rig} onHandleClose={this.handleNoteClose} onHandleSubmit={this.handleNoteSubmit} onHandleChange={this.handleNoteChange} />
                 <div className="page-header">
                     <div className="page-block">
                         <div className="row align-items-center">
@@ -332,6 +392,7 @@ class Rigs extends React.Component {
                                                                 <th style={{width:'10pt'}}></th>
                                                                 <th>Miner Name</th>
                                                                 <th>Group</th>
+                                                                <th>Notes</th>
                                                                 <th>Hashrate</th>
                                                                 <th>Max ℃</th>
                                                                 <th>UpTime</th>
@@ -339,7 +400,7 @@ class Rigs extends React.Component {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {rigs && rigs.map((rig,i) => (
+                                                            {rigs && rigs.sort((a,b) => a.computerName - b.computerName).map((rig,i) => (
                                                             <tr key={rig._id}
                                                                 // className={rig.minutes > 125 ? 'alert alert-danger' : 'alert alert-success'}
                                                                 >
@@ -378,6 +439,10 @@ class Rigs extends React.Component {
                                                                 </td>
                                                                 <td></td>
                                                                 <td>
+                                                                    {rig.notes && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>}
+                                                                    {rig.notes == null && <i className="far fa-sticky-note" onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                </td>
+                                                                <td>
                                                                     <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             <label className=''>{(rig.totalHashrate/1).toFixed(2)} MH/s</label>
@@ -390,10 +455,8 @@ class Rigs extends React.Component {
                                                                 <td>
                                                                     <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
-                                                                            {Math.max(...rig.temperatures)}℃<br/>
-                                                                            {Math.max(...rig.fanSpeeds)}%<br/>
-                                                                            {/* {(rig.temperatures.reduce(function(a, b) { return a < b; })).toFixed(0)}&nbsp;℃<br/> */}
-                                                                            {/* {rig.fanSpeeds.reduce(function(a, b) { return a + b; })/rig.fanSpeeds.length}&nbsp;% */}
+                                                                            {this.styleMaxTemp(rig.temperatures)}
+                                                                            {Math.max(...rig.fanSpeeds)}&nbsp;%
                                                                         </div>
                                                                         <div>
                                                                             <span>
@@ -429,7 +492,10 @@ class Rigs extends React.Component {
                                                                     {/* <i data-toggle="modal" data-id="id value" data-target="#default-Modal" className="fas fa-edit"></i>&nbsp;&nbsp; */}
                                                                     <i className="fas fa-edit" style={{cursor: 'pointer'}} onClick={() => this.handleModal(rig)}></i>&nbsp;&nbsp;
                                                                     <i className="fas fa-redo" id="redo" onClick={this.setAction.bind(this, rig)} tooltip="delete"></i>&nbsp;&nbsp;
-                                                                    {rig.minutes > 2 && <i className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(rig)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {rig.minutes > 2 && 
+                                                                        <i className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(rig)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {rig.minutes <= 2 && 
+                                                                        <i className="fas fa-trash-alt" style={{opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
                                                                 </td>
                                                             </tr>)
                                                             )}

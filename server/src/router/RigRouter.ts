@@ -77,7 +77,6 @@ export class RigRouter {
 
         rig.save()
             .then(data => {
-                console.log("rig saved", data);
                 res.status(201).json({data});
             })
             .catch(err => {
@@ -132,7 +131,6 @@ export class RigRouter {
                         computer: updRig['computerName'],
                         action: data
                     };
-                    console.log('rig return', rigReturn);
                     res.status(200).json({
                         rigReturn
                     });
@@ -148,16 +146,27 @@ export class RigRouter {
     public PatchName(req: Request, res: Response): void {
         const id: string = req.params.id;
         const name: string = req.body.name;
-        console.info('name', name);
         Rig.findByIdAndUpdate( id, {$set: { 'computerName': name }}, {new: true}, function(err, model) {
             if (err) res.status(400).json(err);
             
-            console.info('patch rig data ', model);
             res.status(200).json({
                 model
             });
         });
     }
+
+    public PatchNote(req: Request, res: Response): void {
+        const id: string = req.params.id;
+        const note: string = req.body.note;
+        Rig.findByIdAndUpdate( id, {$set: { 'notes': note }}, {new: true}, function(err, rig) {
+            if (err) res.status(400).json(err);
+            
+            res.status(200).json({
+                rig
+            });
+        });
+    }
+
 
     public DeleteRig(req: Request, res: Response): void {
         const id: string = req.params.id;
@@ -194,6 +203,7 @@ export class RigRouter {
         this.router.post('/', this.CreateRig);
         this.router.put('/:id', this.UpdateRig);
         this.router.put('/:id/name', this.PatchName);
+        this.router.put('/:id/note', this.PatchNote);
         this.router.delete('/:id', this.DeleteRig);
     }
 }

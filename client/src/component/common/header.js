@@ -1,12 +1,13 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 const Header = () => (
     <nav className="navbar header-navbar pcoded-header">
         <div className="navbar-wrapper">
             <div className="navbar-logo">
-                <a href="index.html">
-                    <img className="img-fluid" src="static/media/logo.jpeg" alt="Theme-Logo" />
-                </a>
+                <NavLink to='/'>
+                    <img className="img-fluid" src="gns.jpeg" alt="Theme-Logo" />
+                </NavLink>
                 <a className="mobile-menu" id="mobile-collapse" href="#!">
                     <i className="feather icon-menu"></i>
                 </a>
