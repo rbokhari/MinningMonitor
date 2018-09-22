@@ -33,10 +33,18 @@ const Menu = () => (
                     <li className="">
                         <NavLink to="/groups" className="waves-effect waves-dark">
                             <span className="pcoded-micon"><i className="feather icon-user"></i></span>
-                            <span>Miners Group</span>
+                            <span>Miner Groups</span>
                         </NavLink>
                     </li>
                 </ul>
+                {/* <ul className="pcoded-item pcoded-left-item">
+                    <li className="">
+                        <NavLink to="/clients" className="waves-effect waves-dark">
+                            <span className="pcoded-micon"><i className="feather icon-user"></i></span>
+                            <span>Miner Clients</span>
+                        </NavLink>
+                    </li>
+                </ul> */}
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
                         <NavLink to="/pool" className="waves-effect waves-dark">

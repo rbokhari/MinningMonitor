@@ -7,7 +7,7 @@ import * as helmet from 'helmet';
 import * as cors from 'cors';
 
 import config from './config';
-import { RigRouter, ActionRouter } from './router';
+import { RigRouter, ActionRouter, MinerGroupRouter, MinerClientRouter } from './router';
 
 class Server {
 
@@ -54,7 +54,8 @@ class Server {
         this.app.use('/', router);
         this.app.use('/api/v1/rigs', RigRouter);
         this.app.use('/api/v1/actions', ActionRouter);
-
+        this.app.use('/api/v1/client', MinerClientRouter);
+        this.app.use('/api/v1/group', MinerGroupRouter);
     }
 }
 

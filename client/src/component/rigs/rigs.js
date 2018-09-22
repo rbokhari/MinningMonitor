@@ -11,6 +11,12 @@ import RigNoteModal from './rigNoteModal';
 
 require('../../toastr.min.css');
 
+const styles = {
+    'danger': {
+
+    }
+};
+
 class Rigs extends React.Component {
 
     constructor(props) {
@@ -20,6 +26,7 @@ class Rigs extends React.Component {
             indexEdit: -1,
             idEdit: '',
             rigs: [],
+            groups: [],
             rig: {},
             showModal: false,
             showDeleteModal: false,
@@ -92,7 +99,7 @@ class Rigs extends React.Component {
         // let rigs = this.state.rigs;
         // rigs[indexEdit].isNameEdit = false;
         const { rig } = this.state;
-        Api.put(`rigs/${rig._id}/name`, {'name': rig.computerName})
+        Api.put(`rigs/${rig._id}/name`, {'name': rig.computerName, 'group': rig.group})
             .then(res => {
                 this.handleModalClose();
                 this.getData();
@@ -101,7 +108,11 @@ class Rigs extends React.Component {
 
     handleModal(rig) {
         const rigClone = Object.assign({}, rig);
-        this.setState((prevState, props) => ({showModal: true, rig: rigClone}));
+        Api.get('group')
+            .then(res => res.json())
+            .then(data => {
+                this.setState((prevState, props) => ({groups: data.data, showModal: true, rig: rigClone}));
+            })
     }
 
     handleModalClose() {
@@ -110,38 +121,46 @@ class Rigs extends React.Component {
 
     handleChange(e) {
         e.preventDefault();
-        const { rig } = this.state;
-        rig.computerName = e.target.value;
+        let { rig } = this.state;
+        rig[e.target.name] = e.target.value;
         this.setState({ rig: rig });
     }
 
     getData() {
-        Api.get('rigs')
+        Api.get('group')
             .then(res => res.json())
             .then(data => {
-                const rigs = data.data
-                    // .sort((a,b) => {
-                    //     //a.computerName < b.computerName
-                    //     var x = a.computerName.toLowerCase();
-                    //     var y = b.computerName.toLowerCase();
-                    //     if (x < y) {return -1;}
-                    //     if (x > y) {return 1;}
-                    // })
-                    .map(rig => {
-                        return {
-                            ...rig,
-                            totalHashrate: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : rig.totalHashrate,
-                            maxTemp: 0,
-                            maxFan: 0,
-                            isNameEdit: false,
-                            minutes: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60),
-                            isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : 1,
-                            format: moment(rig.ping_time).fromNow()
-                        }
-                    });
-                this.setState((prevState, props) => ({rigs: rigs}));
-            })
-            .catch(err => console.error('fetch error', err));
+                this.setState({groups: data.data});
+                Api.get('rigs')
+                    .then(res => res.json())
+                    .then(data => {
+                        const rigs = data.data
+                            // .sort((a,b) => {
+                            //     //a.computerName < b.computerName
+                            //     var x = a.computerName.toLowerCase();
+                            //     var y = b.computerName.toLowerCase();
+                            //     if (x < y) {return -1;}
+                            //     if (x > y) {return 1;}
+                            // })
+                            .map(rig => {
+                                return {
+                                    ...rig,
+                                    totalHashrate: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : rig.totalHashrate,
+                                    maxTemp: 0,
+                                    maxFan: 0,
+                                    groupName: rig.group && this.state.groups.filter(c=>c._id==rig.group)[0].name,
+                                    isNameEdit: false,
+                                    minutes: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60),
+                                    isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : 1,
+                                    format: moment(rig.ping_time).fromNow()
+                                }
+                            });
+                        this.setState((prevState, props) => ({rigs: rigs}));
+                    })
+                    .catch(err => console.error('fetch error', err));
+            }, err => {
+                console.error('loading rig data error', err);
+             })
     }
 
     deleteRig(id) {
@@ -306,12 +325,12 @@ class Rigs extends React.Component {
     }
 
     render() {
-        const { showModal, showDeleteModal, showNoteModal, rigs, rig } = this.state;
+        const { showModal, showDeleteModal, showNoteModal, rigs, rig, groups } = this.state;
         return (<div>
             <div className="pcoded-content">
                 <ToastContainer ref="container"
                         className="toast-top-right" />
-                <RigEditModal isOpen={showModal} rig={rig} onHandleClose={this.handleModalClose} onHandleChange={this.handleChange} onHandleSubmit={this.handleSubmit}  />
+                <RigEditModal isOpen={showModal} rig={rig} groups={groups} onHandleClose={this.handleModalClose} onHandleChange={this.handleChange} onHandleSubmit={this.handleSubmit}  />
                 <RigDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
                 <RigNoteModal isOpen={showNoteModal} rig={rig} onHandleClose={this.handleNoteClose} onHandleSubmit={this.handleNoteSubmit} onHandleChange={this.handleNoteChange} />
                 <div className="page-header">
@@ -403,6 +422,8 @@ class Rigs extends React.Component {
                                                             {rigs && rigs.sort((a,b) => a.computerName - b.computerName).map((rig,i) => (
                                                             <tr key={rig._id}
                                                                 // className={rig.minutes > 125 ? 'alert alert-danger' : 'alert alert-success'}
+                                                                // className={(Math.max(...rig.temperatures))>80 ? 'alert alert-danger' : ''}
+                                                                // style={{'backgroundColor': ((Math.max(...rig.temperatures))>75 && (Math.max(...rig.temperatures))<=85) ? '#fff8e6' : (Math.max(...rig.temperatures))>85 ? '#ffece6' : ''}}
                                                                 >
                                                                 <td>
                                                                     <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'info' : 'info'}>
@@ -425,6 +446,7 @@ class Rigs extends React.Component {
                                                                         <MappleToolTip float={true} direction={'bottom'} mappleType={'info'}>
                                                                             <div>
                                                                                 {rig.computerName}
+                                                                                
                                                                             </div>
                                                                             <div>
                                                                                 OS Version : <br/>
@@ -437,10 +459,10 @@ class Rigs extends React.Component {
                                                                     </a>}
                                                                     </div>
                                                                 </td>
-                                                                <td></td>
+                                                                <td>{rig.groupName}</td>
                                                                 <td>
                                                                     {rig.notes && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>}
-                                                                    {rig.notes == null && <i className="far fa-sticky-note" onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {rig.notes == null && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
                                                                     <MappleToolTip float={true} direction={'top'} mappleType={'info'}>

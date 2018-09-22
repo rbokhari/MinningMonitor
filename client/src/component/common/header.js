@@ -65,13 +65,13 @@ const Header = () => (
                         <div className="dropdown-primary dropdown">
                             <div className="dropdown-toggle" data-toggle="dropdown">
                                 <i className="icon feather icon-settings"></i>
-                                <span>John Doe</span>
+                                <span>Waheed Ali</span>
                                 <i className="feather icon-chevron-down"></i>
                             </div>
                             <ul className="show-notification profile-notification dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
                                 <li className="drp-u-details">
                                     <img src="assets/images/avatar-4.jpg" className="img-radius" alt="User-Profile" />
-                                    <span>John Doe</span>
+                                    <span>Waheed Ali</span>
                                     <a href="auth-sign-in-social.html" className="dud-logout" title="Logout">
                                         <i className="feather icon-log-out"></i>
                                     </a>

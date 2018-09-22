@@ -193,6 +193,11 @@ def init():
                     action_id = actions[0]['action']
                     if action_id == 1:
                         execute_sh()
+
+                group = result['rigReturn']['group']
+                if (len(group)):
+                    save_group_config_to_file(group['configuration'])
+                    
             except requests.exceptions.ConnectionError as e:
                 print('Connection failed.')
                 #raise ApiError('POST /tasks/ {}'.format(result.status_code))
@@ -244,6 +249,11 @@ def save_id_to_file(id):
 
 def save_name_to_file(name):
     f = open("name.txt", "w+")
+    f.write(name)
+    f.close()
+
+def save_group_config_to_file(name):
+    f = open("group_config.txt", "w+")
     f.write(name)
     f.close()
 

@@ -78,6 +78,10 @@ export const RigSchema: Schema = new Schema({
     },
     notes: {
         type: String
+    },
+    group: {
+        type: Schema.Types.ObjectId,
+        ref: 'MinerGroup'
     }
 });
 

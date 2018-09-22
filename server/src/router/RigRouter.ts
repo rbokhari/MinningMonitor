@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Rig from '../models/rig';
 import Action from '../models/action';
+import MinerGroup from '../models/minerGroup';
 
 export class RigRouter {
     router: Router;
@@ -12,6 +13,7 @@ export class RigRouter {
 
     public GetRigs(req: Request, res: Response): void {
         Rig.find()
+            .sort('computerName')
             .then(data => {
                 res.status(200).json({
                     data
@@ -36,12 +38,12 @@ export class RigRouter {
     }
 
     public CreateRig(req: Request, res: Response): void {
-        if (!req.body.content) {
-            res.status(400).send({
-                message: "Note content can not be empty"
-            });
-            return;
-        }
+        // if (!req.body.content) {
+        //     res.status(400).send({
+        //         message: "Note content can not be empty"
+        //     });
+        //     return;
+        // }
 
         const cards: Number = req.body.cards;
         const osName: string = req.body.osName;
@@ -126,14 +128,27 @@ export class RigRouter {
             Action.find({rig: id})
                 .then(data => {
                     //const rigReturn = {...model, actions: data};
-                    const rigReturn = {
+                    let rigReturn = {
                         rigId: updRig._id,
                         computer: updRig['computerName'],
-                        action: data
+                        action: data,
+                        group: {}
                     };
-                    res.status(200).json({
-                        rigReturn
-                    });
+
+                    if (updRig['group']) {
+                        MinerGroup.findById(updRig['group'])
+                            .then(gp => {
+                                rigReturn.group = gp;
+                                res.status(200).json({
+                                    rigReturn
+                                });
+                            })
+                            .catch(err => res.status(400).json(err));
+                    } else {
+                        res.status(200).json({
+                            rigReturn
+                        });
+                    }
                 })
                 .catch(err => {
                     res.status(400).json(err);
@@ -146,7 +161,8 @@ export class RigRouter {
     public PatchName(req: Request, res: Response): void {
         const id: string = req.params.id;
         const name: string = req.body.name;
-        Rig.findByIdAndUpdate( id, {$set: { 'computerName': name }}, {new: true}, function(err, model) {
+        const group: string = req.body.group;
+        Rig.findByIdAndUpdate( id, {$set: { 'computerName': name, 'group': group }}, {new: true}, function(err, model) {
             if (err) res.status(400).json(err);
             
             res.status(200).json({

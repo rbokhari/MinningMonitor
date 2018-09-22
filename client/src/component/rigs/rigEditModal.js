@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const RigEditModal = ({isOpen, rig, onHandleChange, onHandleSubmit, onHandleClose}) => {
+const RigEditModal = ({isOpen, rig, groups, onHandleChange, onHandleSubmit, onHandleClose}) => {
     
     if (!isOpen) return (null);
     return (
@@ -18,9 +18,9 @@ const RigEditModal = ({isOpen, rig, onHandleChange, onHandleSubmit, onHandleClos
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Group:</label>
                         <div className="col-sm-9">
-                            <select className="form-control">
+                            <select className="form-control" name="group" onChange={onHandleChange}>
                                 <option></option>
-                                <option>Default</option>
+                                {groups && groups.map((gp,i) => (<option key={i} value={gp._id}>{gp.name}</option>))}
                             </select>
                         </div>
                     </div>
