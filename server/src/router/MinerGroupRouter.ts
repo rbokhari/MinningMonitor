@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import MinerGroup from '../models/minerGroup';
+import Rig from '../models/rig';
 
 export class MinerGroupRouter {
     router: Router;
@@ -12,24 +13,39 @@ export class MinerGroupRouter {
     public GetAll(req: Request, res: Response): void {
         MinerGroup.find()
             .populate('MinerClient')
-            .sort('name')
-            .then(data => {
-                res.status(200).json({
-                    data
-                });
-            })
-            .catch(err => {
-                res.status(500).json(err);
+            //.sort('name')
+            .exec((err, groups) => {
+                if (err) res.status(500).json(err); 
+
+                Rig.find({'group': {$ne: null}})
+                    .exec((er, rigs) => {
+
+                        let data = groups.map(gp => {
+                            return {
+                                'group': gp,
+                                'miner': rigs.filter(d => (d['group'].equals(gp._id)))
+                            };
+                        });
+
+                        res.status(200).json(data);
+                    });
+
             });
+            // .then(data => {
+            //     res.status(200).json({
+            //         data
+            //     });
+            // })
+            // .catch(err => {
+            //     res.status(500).json(err);
+            // });
     }
     
     public GetSingle(req: Request, res: Response): void {
         const id: string = req.params.id;
         MinerGroup.findOne({_id: id})
             .then(data => {
-                res.status(200).json({
-                    data
-                });
+                res.status(200).json(data);
             })
             .catch(err => {
                 res.status(500).json(err);

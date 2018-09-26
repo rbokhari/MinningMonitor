@@ -22,6 +22,11 @@ class Rigs extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            sortBy: 'computerName',
+            sortDirection: 1,
+            actionId: 0,
+            actionPosting: 0,
+            actionRigId: '',
             isEditable: false,
             indexEdit: -1,
             idEdit: '',
@@ -49,7 +54,42 @@ class Rigs extends React.Component {
         this.handleNoteClose = this.handleNoteClose.bind(this);
         this.handleNoteSubmit = this.handleNoteSubmit.bind(this);
         this.handleNoteChange = this.handleNoteChange.bind(this);
+        this.sorting = this.sorting.bind(this);
+        this.compare = this.compare.bind(this);
+        this.setAction = this.setAction.bind(this);
         //this.setEdit = this.setEdit.bind(this);
+    }
+
+    compare(a, b) {
+        const { sortBy, sortDirection } = this.state;
+        console.info('compare', sortBy, sortDirection);
+        if (sortDirection == 1) {
+            if (a[sortBy] > b[sortBy])
+              return -1;
+            if (a[sortBy] < b[sortBy])
+              return 1; 
+        } else {
+            if (a[sortBy] < b[sortBy])
+              return -1;
+            if (a[sortBy] > b[sortBy])
+              return 1; 
+        }
+        return 0;
+    }
+
+    sorting(rigs, sortedBy) {
+        console.info('sorting', sortedBy);
+        if (sortedBy != '') {
+            this.setState({ sortBy: sortedBy });
+        }
+        const sortedRigs = rigs.sort(this.compare);
+        this.setState({ rigs: sortedRigs });
+    }
+    
+    sortByHeader(rigs, sortedBy) {
+        const { sortDirection } = this.state;
+        this.sorting(rigs, sortedBy);
+        this.setState({ sortDirection: sortDirection ==  1 ? 0 : 1 });
     }
 
     componentDidMount() {
@@ -65,12 +105,13 @@ class Rigs extends React.Component {
         let { rigs, idEdit } = this.state;
 
         rigs = rigs.map((rig, i) => {
-            return {
-                ...rig,
-                isNameEdit: (i==index)
-            }
+            return (
+                {
+                    ...rig,
+                    isNameEdit: (i==index)
+                }
+            );
         });
-        console.info('rigs', rigs);
         // let currRig = this.state.rigs.filter((r,i) => (i == index));
         // console.info(currRig);
         // currRig.isNameEdit = true;
@@ -111,7 +152,7 @@ class Rigs extends React.Component {
         Api.get('group')
             .then(res => res.json())
             .then(data => {
-                this.setState((prevState, props) => ({groups: data.data, showModal: true, rig: rigClone}));
+                this.setState((prevState, props) => ({groups: data, showModal: true, rig: rigClone}));
             })
     }
 
@@ -129,12 +170,13 @@ class Rigs extends React.Component {
     getData() {
         Api.get('group')
             .then(res => res.json())
-            .then(data => {
-                this.setState({groups: data.data});
+            .then(groups => {
+                this.setState({groups: groups});
                 Api.get('rigs')
                     .then(res => res.json())
                     .then(data => {
                         const rigs = data.data
+                            //.sort(this.compare)
                             // .sort((a,b) => {
                             //     //a.computerName < b.computerName
                             //     var x = a.computerName.toLowerCase();
@@ -148,14 +190,15 @@ class Rigs extends React.Component {
                                     totalHashrate: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : rig.totalHashrate,
                                     maxTemp: 0,
                                     maxFan: 0,
-                                    groupName: rig.group && this.state.groups.filter(c=>c._id==rig.group)[0].name,
+                                    groupName: rig.group && groups && groups.filter(c=>c.group._id==rig.group)[0].group.name,
                                     isNameEdit: false,
                                     minutes: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60),
                                     isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : 1,
                                     format: moment(rig.ping_time).fromNow()
                                 }
                             });
-                        this.setState((prevState, props) => ({rigs: rigs}));
+                        let sortRigs = this.sorting(rigs, '')
+                        //this.setState((prevState, props) => ({rigs: sortRigs}));
                     })
                     .catch(err => console.error('fetch error', err));
             }, err => {
@@ -163,11 +206,11 @@ class Rigs extends React.Component {
              })
     }
 
-    deleteRig(id) {
-        Api.delete(`rigs/${id}`)
-            .then(res => this.getData())
-            .catch(err => console.error('Delete Rig', err));
-    }
+    // deleteRig(id) {
+    //     Api.delete(`rigs/${id}`)
+    //         .then(res => this.getData())
+    //         .catch(err => console.error('Delete Rig', err));
+    // }
 
     handleDeleteModal(rig) {
         const rigClone = Object.assign({}, rig);
@@ -204,7 +247,6 @@ class Rigs extends React.Component {
     handleNoteSubmit(e) {
         e.preventDefault();
         const { rig } = this.state;
-        console.info('rig', rig);
         this.setState(prevState => ({showNoteModal: false}));
         Api.put(`rigs/${rig._id}/note`, {'note': rig.notes})
             .then(res => {
@@ -232,15 +274,28 @@ class Rigs extends React.Component {
         this.setState(prevState => ({showNoteModal: false}));
     }
 
-    setAction(rig) {
+    setAction(rig, actionId) {
         const action = {
             rig: rig._id,
-            action: 1,
+            action: actionId,
             status: 1
         };
+        let msg = '';
         
+        if (actionId == 1) msg = 'Machine Reset action added. '
+        else if (actionId == 2) msg = 'Miner Reset action added.'
+
+        this.setState({ actionId: actionId, actionPosting: 1, actionRigId: rig._id});
         Api.post('actions', action)
-            .then(res => console.info('action', res))
+            .then(res => {
+                this.refs.container.success(
+                    "Success !",
+                    msg, {
+                    timeOut: 1000,
+                    extendedTimeOut: 100
+                });
+                this.setState({ actionId: 0, actionPosting: 0, actionRigId: ''});
+            })
             .catch(err => console.error('action error', err));
     }
 
@@ -300,8 +355,8 @@ class Rigs extends React.Component {
             ${isNaN(day) ? 0 : day}d
             ${isNaN(hour) ? 0 : hour}h 
             ${isNaN(minute) ? 0 : minute}m 
-            ${isNaN(seconds) ? 0 : seconds}s
         `;
+            // ${isNaN(seconds) ? 0 : seconds}s
     }
 
     calculateMining() {
@@ -325,7 +380,7 @@ class Rigs extends React.Component {
     }
 
     render() {
-        const { showModal, showDeleteModal, showNoteModal, rigs, rig, groups } = this.state;
+        const { showModal, showDeleteModal, showNoteModal, rigs, rig, groups, sortBy, sortDirection, actionId, actionPosting, actionRigId } = this.state;
         return (<div>
             <div className="pcoded-content">
                 <ToastContainer ref="container"
@@ -409,17 +464,25 @@ class Rigs extends React.Component {
                                                         <thead>
                                                             <tr>
                                                                 <th style={{width:'10pt'}}></th>
-                                                                <th>Miner Name</th>
+                                                                <th onClick={() => this.sortByHeader(rigs, 'computerName')}>
+                                                                    Miner Name&nbsp;
+                                                                    {sortBy == 'computerName' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
+                                                                    {sortBy == 'computerName' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
+                                                                </th>
                                                                 <th>Group</th>
                                                                 <th>Notes</th>
                                                                 <th>Hashrate</th>
                                                                 <th>Max ℃</th>
-                                                                <th>UpTime</th>
+                                                                <th onClick={() => this.sortByHeader(rigs, 'rigUpTime')}>
+                                                                    UpTime&nbsp;
+                                                                    {sortBy == 'rigUpTime' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
+                                                                    {sortBy == 'rigUpTime' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
+                                                                </th>
                                                                 <th>Functions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {rigs && rigs.sort((a,b) => a.computerName - b.computerName).map((rig,i) => (
+                                                            {rigs && rigs.map((rig,i) => (
                                                             <tr key={rig._id}
                                                                 // className={rig.minutes > 125 ? 'alert alert-danger' : 'alert alert-success'}
                                                                 // className={(Math.max(...rig.temperatures))>80 ? 'alert alert-danger' : ''}
@@ -512,8 +575,17 @@ class Rigs extends React.Component {
                                                                 </td>
                                                                 <td>
                                                                     {/* <i data-toggle="modal" data-id="id value" data-target="#default-Modal" className="fas fa-edit"></i>&nbsp;&nbsp; */}
-                                                                    <i className="fas fa-edit" style={{cursor: 'pointer'}} onClick={() => this.handleModal(rig)}></i>&nbsp;&nbsp;
-                                                                    <i className="fas fa-redo" id="redo" onClick={this.setAction.bind(this, rig)} tooltip="delete"></i>&nbsp;&nbsp;
+                                                                    <i className="fas fa-edit" s tyle={{cursor: 'pointer'}} onClick={() => this.handleModal(rig)}></i>&nbsp;&nbsp;
+                                                                    <i 
+                                                                        className={actionId== 2 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-sync-alt fa-spin' : 'fas fa-sync-alt'} 
+                                                                        onClick={() => this.setAction(rig, 2)} 
+                                                                        style={{cursor: 'pointer'}} >
+                                                                    </i>&nbsp;&nbsp;
+                                                                    <i className={actionId== 1 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-redo fa-spin' : 'fas fa-redo'} id="redo" 
+                                                                        onClick={() => this.setAction(rig, 1)} 
+                                                                        style={{cursor: 'pointer'}} 
+                                                                        tooltip="delete">
+                                                                    </i>&nbsp;&nbsp;
                                                                     {rig.minutes > 2 && 
                                                                         <i className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(rig)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
                                                                     {rig.minutes <= 2 && 

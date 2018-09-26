@@ -2,17 +2,17 @@ import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const RigEditModal = ({isOpen, rig, groups, onHandleChange, onHandleSubmit, onHandleClose}) => {
-    
+    console.info(groups);
     if (!isOpen) return (null);
     return (
         <Modal isOpen={isOpen}>
             <form onSubmit={onHandleSubmit}>
-                <ModalHeader>Miner Detail</ModalHeader>
+                <ModalHeader>Miner {rig.computerName}</ModalHeader>
                 <ModalBody>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Miner Name:</label>
                         <div className="col-sm-9">
-                            <input type="text" className="form-control" value={rig && rig.computerName} onChange={onHandleChange} />
+                            <input type="text" name="computerName" className="form-control" value={rig && rig.computerName} onChange={onHandleChange} />
                         </div>
                     </div>
                     <div className="form-group row">
@@ -20,7 +20,7 @@ const RigEditModal = ({isOpen, rig, groups, onHandleChange, onHandleSubmit, onHa
                         <div className="col-sm-9">
                             <select className="form-control" name="group" onChange={onHandleChange}>
                                 <option></option>
-                                {groups && groups.map((gp,i) => (<option key={i} value={gp._id}>{gp.name}</option>))}
+                                {groups && groups.map((gp,i) => (<option key={i} value={gp.group._id} selected={gp.group._id==rig.group}>{gp.group.name}</option>))}
                             </select>
                         </div>
                     </div>

@@ -1,5 +1,7 @@
 import React from 'react';
+//import toaster from 'react-toasty';
 import MinerGroupModal from './addNewModal';
+import GroupDeleteModal from './groupDeleteModal';
 
 import Api from '../../api/Api';
 
@@ -10,6 +12,7 @@ class Groups extends React.Component {
 
         this.state = {
             showModal: false,
+            showDeleteModal: false,
             group: {
                 name: '',
                 client: 0,
@@ -17,7 +20,8 @@ class Groups extends React.Component {
                 notes: ''
             },
             groups: [],
-            clients: []
+            clients: [],
+            miners: []
         };
 
         this.getData = this.getData.bind(this);
@@ -25,6 +29,12 @@ class Groups extends React.Component {
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleModalShow = this.handleModalShow.bind(this);
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
+
+        this.handleEditModalShow = this.handleEditModalShow.bind(this);
+
+        this.handleDeleteSubmit = this.handleDeleteSubmit.bind(this);
+        this.handleDeleteModal = this.handleDeleteModal.bind(this);
+        this.handleDeleteClose = this.handleDeleteClose.bind(this);
     }
 
     componentDidMount() {
@@ -32,13 +42,19 @@ class Groups extends React.Component {
     }
 
     getData() {
-        Api.get('group')
+        //toastr.info('Getting data !');
+        Api.get('client')
             .then(res => res.json())
             .then(data => {
-                console.info('group data', data);
-                this.setState({groups: data.data});
-            }, err => {
-                console.error('error', err);
+                this.setState({clients: data.data});
+                Api.get('group')
+                    .then(res => res.json())
+                    .then(group => {
+                        console.info('group data', group);
+                        this.setState({groups: group});
+                    }, err => {
+                        console.error('error', err);
+                    });
             });
     }
 
@@ -67,20 +83,79 @@ class Groups extends React.Component {
         e.preventDefault();
         const { group } = this.state;
         console.info('group', group);
-        Api.post('group', group)
-            .then(res => {
-                console.info('group post', res);
-                this.handleModalClose();
-            }, err => {
-                console.error('group error', err);
-            });
-
+        
+        if (group.id) {
+            Api.put(`group/${group.id}`, group)
+                .then(res => {
+                    console.info('group post', res);
+                    this.handleModalClose();
+                    this.getData();
+                }, err => {
+                    console.error('group error', err);
+                });
+        } else {
+            Api.post('group', group)
+                .then(res => {
+                    console.info('group post', res);
+                    this.handleModalClose();
+                    this.getData();
+                }, err => {
+                    console.error('group error', err);
+                });
+        }
     }
 
+    handleEditModalShow(group) {
+        const updateGp = {
+            id: group._id,
+            name: group.name,
+            notes: group.notes,
+            client: group.minerClient,
+            config: group.configuration,
+            status: group.status
+        };
+        Api.get('client')
+            .then(res => res.json())
+            .then(data => {
+                this.setState({clients: data.data, showModal: true, group: updateGp});
+            }, err => {
+                console.error('err', err);
+            });
+    }
+    
+    handleDeleteModal(group) {
+        const groupClone = Object.assign({}, group);
+        this.setState((prevState, props) => ({showDeleteModal: true, group: groupClone}));
+    }
+
+    handleDeleteSubmit(e) {
+        e.preventDefault();
+        const { group } = this.state;
+        this.setState(prevState => ({showDeleteModal: false}));
+        Api.delete(`group/${group._id}`)
+            .then(res => {
+                this.getData();
+                // this.refs.container.success(
+                //     "Success !",
+                //     "Miner is delete.", {
+                //     timeOut: 1000,
+                //     extendedTimeOut: 100
+                //   });
+                })
+            .catch(err => console.error('Delete Group', err));
+    }
+
+    handleDeleteClose(e) {
+        e.preventDefault();
+        this.setState(prevState => ({showDeleteModal: false}));
+    }
+
+
     render() {
-        const { showModal, group, clients, groups } = this.state;
+        const { showModal, group, clients, groups, showDeleteModal, miners } = this.state;
         return (
             <div className="pcoded-content">
+                <GroupDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
                 <MinerGroupModal isOpen={showModal} group={group} clients={clients} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
                 <div className="page-header">
                     <div className="page-block">
@@ -119,25 +194,36 @@ class Groups extends React.Component {
                                             </div>
                                             <div className="card-block table-border-style">
                                                 <div className="table-responsive">
-                                                    <table className="table table-">
+                                                    <table className="table table-xl">
                                                         <thead>
                                                             <tr>
-                                                                <th>Group Name</th>
-                                                                <th>Notes</th>
-                                                                <th>Miners</th>
-                                                                <th>Miner Client</th>
-                                                                <th>Configuration</th>
-                                                                <th>Functions</th>
+                                                                <th className="span2">Group Name</th>
+                                                                <th className="span2">Notes</th>
+                                                                <th className="span1">Miners</th>
+                                                                <th className="span2">Miner Client</th>
+                                                                <th className="span4" style={{'wordWrap':'break-word'}}>Configuration</th>
+                                                                <th className="span1">Functions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {groups && groups.map((gp, i) => (<tr key={i+1}>
-                                                                <td>{gp.name}</td>
-                                                                <td>{gp.notes}</td>
-                                                                <td>{}</td>
-                                                                <td></td>
-                                                                <td>{gp.configuration}</td>
-                                                                <td></td>
+                                                                <td>{gp.group.name}</td>
+                                                                <td>{gp.group.notes}</td>
+                                                                <td>
+                                                                    {gp.miner.length == 0 ? '' : gp.miner.length}
+                                                                </td>
+
+                                                                <td>
+                                                                    {clients && clients.filter(c=>c._id==gp.group.minerClient)[0].name}
+                                                                </td>
+                                                                <td>
+                                                                    <p>{gp.group.configuration.length > 50 ? gp.group.configuration.substring(1, 50) + '  ...' : gp.group.configuration}</p>
+                                                                </td>
+                                                                <td>
+                                                                    <i className="fas fa-edit" onClick={() => this.handleEditModalShow(gp.group)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
+                                                                    {gp.miner.length == 0 && <i className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(gp.group)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {gp.miner.length > 0 && <i className="fas fa-trash-alt" style={{cursor: 'pointer', opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
+                                                                </td>
                                                             </tr>))}
                                                         </tbody>
                                                     </table>

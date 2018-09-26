@@ -196,7 +196,8 @@ def init():
 
                 group = result['rigReturn']['group']
                 if (len(group)):
-                    save_group_config_to_file(group['configuration'])
+                    configuration = str(group['configuration']).replace('$MinerName', comp_name)
+                    save_group_config_to_file(configuration)
                     
             except requests.exceptions.ConnectionError as e:
                 print('Connection failed.')

@@ -46,6 +46,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-toastr": "^3.0.0",
+    "react-toasty": "^0.0.4",
     "reactjs-mappletooltip": "^1.4.63",
     "reactpopupmodal": "^0.1.4",
     "reactstrap": "^6.4.0",

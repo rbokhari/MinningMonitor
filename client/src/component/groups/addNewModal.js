@@ -7,18 +7,18 @@ const MinerGroupModal = ({isOpen, group, clients, onHandleChange, onHandleSubmit
     return (
         <Modal isOpen={isOpen}>
             <form onSubmit={onHandleSubmit}>
-                <ModalHeader>Add New Group</ModalHeader>
+                <ModalHeader>{group ? 'Edit Group' : 'Add New Group'}</ModalHeader>
                 <ModalBody>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Name:</label>
                         <div className="col-sm-9">
-                            <input type="text" name="name" className="form-control" onChange={onHandleChange} />
+                            <input type="text" name="name" className="form-control" value={group && group.name} onChange={onHandleChange} />
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Miner Client:</label>
                         <div className="col-sm-9">
-                            <select name="client" className="form-control" onChange={onHandleChange}>
+                            <select name="client" className="form-control" value={group && group.client} onChange={onHandleChange}>
                                 <option></option>
                                 {clients && clients.map((client, i) => (<option key={i} value={client._id}>{client.name}</option>))}
                             </select>
@@ -27,13 +27,13 @@ const MinerGroupModal = ({isOpen, group, clients, onHandleChange, onHandleSubmit
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Configuration:</label>
                         <div className="col-sm-9">
-                            <input type="text" name="config" className="form-control"  onChange={onHandleChange} />
+                            <textarea name="config" className="form-control" rows="5" value={group && group.config}  onChange={onHandleChange}></textarea>
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Remarks:</label>
                         <div className="col-sm-9">
-                            <input type="text" name="notes" className="form-control" onChange={onHandleChange} />
+                            <textarea name="notes" className="form-control" rows="5"  value={group && group.notes} onChange={onHandleChange}></textarea>
                         </div>
                     </div>
                 </ModalBody>
