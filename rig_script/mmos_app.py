@@ -137,10 +137,10 @@ def init():
 
             print('-----------------START------------------')
             print('Number of active cards: ' + str(cards))
-            print('GPU temp: ' + str(temp))
+            # print('GPU temp: ' + str(temp))
             #print('GPU s : ' + gpus)
-            print('Fan speed (%): ' + str(fan))
-            print('Miner uptime is ' + miner_uptime + ' min')
+            # print('Fan speed (%): ' + str(fan))
+            # print('Miner uptime is ' + miner_uptime + ' min')
             # print('Total Shares : ' + str(total_shares) + '')
             # print('Invalid Shares : ' + str(invalid_shares) + '')
             print('Calculating Hashrate ...')
@@ -163,6 +163,8 @@ def init():
 
         lan_ip = get_lan_ip()
         id_file = Path("id.txt")
+        action_file = Path("mmos_action.txt")
+        action_perform = 0
         client_email = Path("gns_config.txt")
         if client_email.is_file():
             register_email = read_email_from_file()
@@ -173,10 +175,16 @@ def init():
             #result = firebase.put('rigs', id, { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': str(temp), 'fan': str(fan), 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate, 'gpus': gpus })
             #print('Rig ping at {}'.format(datetime.now()))
             #rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+            if action_file.is_file():
+                action_file = open("mmos_action.txt")
+                action_perform = action_file.read()
+                action_file.close()
+                os.remove("mmos_action.txt")
+
             if isMinerRunning:
-                rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+                rig = { 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             else:
-                rig = { 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': [], 'fans': [], 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
+                rig = { 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': [], 'fans': [], 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
             try:
                 response = requests.put(uri + '/' + id, json=rig)
                 if response.status_code != requests.codes.ok: # 201:
@@ -190,9 +198,8 @@ def init():
                 actions = result['rigReturn']['action']
                 print(actions)
                 if len(actions) > 0:
-                    action_id = actions[0]['action']
-                    if action_id == 1:
-                        execute_sh()
+                    execute_actions(actions)
+                    time.sleep(15) 
 
                 group = result['rigReturn']['group']
                 if (len(group)):
@@ -270,9 +277,27 @@ def read_email_from_file():
     f.close()
     return email
 
-def execute_sh():
+def execute_actions(actions):
+    print('action found')
+    if len(actions) > 0:
+        action_id = actions[0]['action']
+        if action_id == 1:
+            execute_reboot()
+        elif (action_id == 2):
+            execute_miner_reset()
+
+
+def execute_reboot():
     os.system('sudo ./force_reboot.sh')
-        
+
+def execute_miner_reset():
+    print('reset action')
+    f = open("mmos_action.txt", "w+")
+    f.write(str(2))
+    f.close()
+    print('file created')
+    os.system('su mmos ./miner_restart.sh')
+
 if __name__ == '__main__':
     init()
     #get_ip_address()

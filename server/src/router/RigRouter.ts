@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import Rig from '../models/rig';
 import Action from '../models/action';
 import MinerGroup from '../models/minerGroup';
+import { parse } from 'querystring';
 
 export class RigRouter {
     router: Router;
@@ -15,9 +16,25 @@ export class RigRouter {
         Rig.find()
             .sort('computerName')
             .then(data => {
-                res.status(200).json({
-                    data
-                });
+
+                Action.find()
+                    .then(actions => {
+
+                        let rigData = data.map(d => {
+                            return {
+                                ...d.toJSON(),
+                                action: actions.filter(c => (c['rig'].equals(d._id) && c['status'] == 1)).map(act => {
+                                    return {
+                                        actionId: act['action'],
+                                        status: act['status']
+                                    }
+                                })
+                            }
+                        });
+
+                        res.status(200).json(rigData);
+                    })
+                    .catch(err => res.status(500).json(err));
             })
             .catch(err => {
                 res.status(500).json(err);
@@ -104,6 +121,8 @@ export class RigRouter {
         const temperatures = req.body.temps.map(t=> t);
         const fanSpeeds = req.body.fans.map(f => f);
 
+        const perform_action = req.body.performAction;
+
         const rig = {
             cards,
             osName,
@@ -121,6 +140,15 @@ export class RigRouter {
             updatedAt,
             rigUpTime
         };
+
+        if (perform_action != 0) {
+            Action.findOneAndRemove({ $and: [ { action: perform_action }, { rig: id}]})
+                .then(res => {
+
+                })
+                .catch(err => console.error(err));
+        }
+
         Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, updRig) {
             if (err) res.status(400).json(err);
             

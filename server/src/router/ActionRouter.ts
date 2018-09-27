@@ -67,7 +67,6 @@ export class ActionRouter {
             action: act,
             status
         };
-        console.info(action);
         Action.findByIdAndUpdate( id, {$set: action}, {new: true}, function(err, model) {
             if (err) res.status(400).json(err);
             

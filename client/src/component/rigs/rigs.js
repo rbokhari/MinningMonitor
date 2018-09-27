@@ -62,7 +62,6 @@ class Rigs extends React.Component {
 
     compare(a, b) {
         const { sortBy, sortDirection } = this.state;
-        console.info('compare', sortBy, sortDirection);
         if (sortDirection == 1) {
             if (a[sortBy] > b[sortBy])
               return -1;
@@ -78,7 +77,6 @@ class Rigs extends React.Component {
     }
 
     sorting(rigs, sortedBy) {
-        console.info('sorting', sortedBy);
         if (sortedBy != '') {
             this.setState({ sortBy: sortedBy });
         }
@@ -175,7 +173,7 @@ class Rigs extends React.Component {
                 Api.get('rigs')
                     .then(res => res.json())
                     .then(data => {
-                        const rigs = data.data
+                        const rigs = data
                             //.sort(this.compare)
                             // .sort((a,b) => {
                             //     //a.computerName < b.computerName
@@ -295,6 +293,7 @@ class Rigs extends React.Component {
                     extendedTimeOut: 100
                 });
                 this.setState({ actionId: 0, actionPosting: 0, actionRigId: ''});
+                this.getData();
             })
             .catch(err => console.error('action error', err));
     }
@@ -564,7 +563,7 @@ class Rigs extends React.Component {
                                                                         </div>
                                                                         <div>
                                                                             <span>
-                                                                                System Up Time : <br />
+                                                                                System Up Time : {moment(rig.serverTime).format('DD/MM/YYYY hh:mm')}<br />
                                                                                 Miner Up Time : {rig.isOnline == 0 && '--'} {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)} <br/>
                                                                                 {/* Last Seen Seconds : {((new Date() - new Date(rig.updatedAt))/1000).toFixed(0)}&nbsp;sec<br /> */}
                                                                                 Last Seen : {this.formatLastSeen2(rig.updatedAt)}<br />
@@ -579,11 +578,11 @@ class Rigs extends React.Component {
                                                                     <i 
                                                                         className={actionId== 2 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-sync-alt fa-spin' : 'fas fa-sync-alt'} 
                                                                         onClick={() => this.setAction(rig, 2)} 
-                                                                        style={{cursor: 'pointer'}} >
+                                                                        style={{cursor: 'pointer', color: rig.action.filter(f=>f.actionId ==2).length > 0 ? 'red' : 'black'}} >
                                                                     </i>&nbsp;&nbsp;
                                                                     <i className={actionId== 1 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-redo fa-spin' : 'fas fa-redo'} id="redo" 
                                                                         onClick={() => this.setAction(rig, 1)} 
-                                                                        style={{cursor: 'pointer'}} 
+                                                                        style={{cursor: 'pointer', color: rig.action.filter(f=>f.actionId ==1).length > 0 ? 'red' : 'black'}} 
                                                                         tooltip="delete">
                                                                     </i>&nbsp;&nbsp;
                                                                     {rig.minutes > 2 && 
