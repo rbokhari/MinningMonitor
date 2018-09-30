@@ -14,6 +14,7 @@ import platform
 #uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 uri = "http://mmosapi.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
+OS_VERSION=10001
 
 # firebase = firebase.FirebaseApplication('https://genesuspool.firebaseio.com/')
 miner_ip = '127.0.0.1'
@@ -182,9 +183,9 @@ def init():
                 os.remove("mmos_action.txt")
 
             if isMinerRunning:
-                rig = { 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+                rig = { 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             else:
-                rig = { 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': [], 'fans': [], 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
+                rig = { 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osName', OS_VERSION: 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': [], 'fans': [], 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
             try:
                 response = requests.put(uri + '/' + id, json=rig)
                 if response.status_code != requests.codes.ok: # 201:
@@ -212,7 +213,7 @@ def init():
 
         else:
             #result = register_rig()
-            rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+            rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             try:
                 response = requests.post(uri, json=rig)
                 if response.status_code != requests.codes.created: # 200:

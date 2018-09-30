@@ -1,10 +1,10 @@
 import React from 'react';
 import moment from 'moment';
-import MappleToolTip from 'reactjs-mappletooltip'; 
-import { ToastContainer } from "react-toastr";
+//import MappleToolTip from 'reactjs-mappletooltip'; 
+import toastr from 'toastr';
+import ReactToolTip from 'react-tooltip';
 import Api from '../../api/Api';
-//import { Modal } from '../common/';
-import { Modal } from 'react-bootstrap';
+import { IsLoading, ConfirmDialog } from '../common/';
 import RigEditModal from './rigEditModal';
 import RigDeleteModal from './rigDeleteModal';
 import RigNoteModal from './rigNoteModal';
@@ -22,6 +22,10 @@ class Rigs extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            isConfirmModal: false,
+            isConfirmSuccess: false,
+            isConfirmFail: false,
+            isLoading: true,
             sortBy: 'computerName',
             sortDirection: 1,
             actionId: 0,
@@ -57,7 +61,29 @@ class Rigs extends React.Component {
         this.sorting = this.sorting.bind(this);
         this.compare = this.compare.bind(this);
         this.setAction = this.setAction.bind(this);
+
+        this.handleConfirmModalShow = this.handleConfirmModalShow.bind(this);
+        this.handleConfirmClose = this.handleConfirmClose.bind(this);
+        this.handleConfirmSubmit = this.handleConfirmSubmit.bind(this);
         //this.setEdit = this.setEdit.bind(this);
+
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+          }
     }
 
     compare(a, b) {
@@ -142,6 +168,10 @@ class Rigs extends React.Component {
             .then(res => {
                 this.handleModalClose();
                 this.getData();
+                toastr.success('Name / Group changed!', 'Success !');
+            })
+            .catch(err => {
+                toastr.error('Some error occured !', 'Error  !');
             });
     }
 
@@ -173,18 +203,12 @@ class Rigs extends React.Component {
                 Api.get('rigs')
                     .then(res => res.json())
                     .then(data => {
+                        console.info('data', data);
                         const rigs = data
-                            //.sort(this.compare)
-                            // .sort((a,b) => {
-                            //     //a.computerName < b.computerName
-                            //     var x = a.computerName.toLowerCase();
-                            //     var y = b.computerName.toLowerCase();
-                            //     if (x < y) {return -1;}
-                            //     if (x > y) {return 1;}
-                            // })
                             .map(rig => {
                                 return {
                                     ...rig,
+                                    notes: rig.notes ? rig.notes : '',
                                     totalHashrate: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : rig.totalHashrate,
                                     maxTemp: 0,
                                     maxFan: 0,
@@ -195,6 +219,7 @@ class Rigs extends React.Component {
                                     format: moment(rig.ping_time).fromNow()
                                 }
                             });
+                        this.setState({isLoading: false});
                         let sortRigs = this.sorting(rigs, '')
                         //this.setState((prevState, props) => ({rigs: sortRigs}));
                     })
@@ -222,14 +247,12 @@ class Rigs extends React.Component {
         Api.delete(`rigs/${rig._id}`)
         .then(res => {
             this.getData();
-            this.refs.container.success(
-                "Success !",
-                "Miner is delete.", {
-                timeOut: 1000,
-                extendedTimeOut: 100
-              });
+            toastr.success(`Miner ${rig.computerName} Deleted `, 'Success !');
             })
-            .catch(err => console.error('Delete Rig', err));
+            .catch(err => {
+                toastr.error(`Unable to delete ${rig.computerName} `, 'Error !');
+                console.error('Delete Rig', err);
+            });
     }
 
     handleDeleteClose(e) {
@@ -249,14 +272,12 @@ class Rigs extends React.Component {
         Api.put(`rigs/${rig._id}/note`, {'note': rig.notes})
             .then(res => {
                 this.getData();
-                this.refs.container.success(
-                    "Success !",
-                    "Miner's Note added.", {
-                    timeOut: 1000,
-                    extendedTimeOut: 100
-                });
-                })
-            .catch(err => console.error('Delete Rig', err));
+                toastr.success(`Note for ${rig.computerName} is added `, 'Success !');                
+            })
+            .catch(err => {
+                toastr.error(`Error Occured for creating note `, 'Error !');
+                console.error('Delete Rig', err)
+            });
     }
 
     handleNoteChange(e) {
@@ -280,22 +301,20 @@ class Rigs extends React.Component {
         };
         let msg = '';
         
-        if (actionId == 1) msg = 'Machine Reset action added. '
-        else if (actionId == 2) msg = 'Miner Reset action added.'
+        if (actionId == 1) msg = `Machine ${rig.computerName} Reset action added`
+        else if (actionId == 2) msg = `Miner ${rig.computerName} Reset action added.`
 
         this.setState({ actionId: actionId, actionPosting: 1, actionRigId: rig._id});
         Api.post('actions', action)
             .then(res => {
-                this.refs.container.success(
-                    "Success !",
-                    msg, {
-                    timeOut: 1000,
-                    extendedTimeOut: 100
-                });
+                toastr.success(msg, 'Success !');
                 this.setState({ actionId: 0, actionPosting: 0, actionRigId: ''});
                 this.getData();
             })
-            .catch(err => console.error('action error', err));
+            .catch(err => {
+                toastr.error('Error occured !', 'Error');
+                console.error('action error', err);
+            });
     }
 
     calculateTime(d1) {
@@ -378,12 +397,30 @@ class Rigs extends React.Component {
         else return (<p>{max}&nbsp;℃</p>)
     }
 
+    handleConfirmModalShow(rig, actionId) {
+        this.setState({isConfirmModal: true, rig: rig, actionId: actionId});
+    }
+
+    handleConfirmSubmit(rig, actionId) {
+        alert('alert');
+        this.setAction(rig, actionId);
+    }
+
+    handleConfirmClose() {
+        this.setState({isConfirmModal: false});
+    }
+
     render() {
-        const { showModal, showDeleteModal, showNoteModal, rigs, rig, groups, sortBy, sortDirection, actionId, actionPosting, actionRigId } = this.state;
+        const { isLoading, showModal, showDeleteModal, showNoteModal, rigs, rig, groups, sortBy, sortDirection, 
+            actionId, actionPosting, actionRigId, isConfirmModal } = this.state;
+        
+        var msg = '';
+        if (actionId==1) msg = `Are you sure to reset machine : ${rig.computerName} ?`;
+        else if (actionId==2) msg = `Are you sure to reset miner : ${rig.computerName} ?`
+
         return (<div>
             <div className="pcoded-content">
-                <ToastContainer ref="container"
-                        className="toast-top-right" />
+                <ConfirmDialog isOpen={isConfirmModal} title={`Miner : ${rig.computerName}`} message={msg} onHandleSubmit={this.handleConfirmSubmit} onHandleClose={this.handleConfirmClose} />
                 <RigEditModal isOpen={showModal} rig={rig} groups={groups} onHandleClose={this.handleModalClose} onHandleChange={this.handleChange} onHandleSubmit={this.handleSubmit}  />
                 <RigDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
                 <RigNoteModal isOpen={showNoteModal} rig={rig} onHandleClose={this.handleNoteClose} onHandleSubmit={this.handleNoteSubmit} onHandleChange={this.handleNoteChange} />
@@ -455,7 +492,10 @@ class Rigs extends React.Component {
                                     <div className="card">
                                             <div className="card-header">
                                                 <h5>Miners </h5>
-                                                <span>status of all registered miners</span> 
+                                                <span>click headers to sort accordingly</span> 
+                                                <div className="card-header-right">
+                                                    <i className="fas fa-plus-square" onClick={(e) => this.getData(e)} style={{color:'white'}}></i>Refresh
+                                                </div>
                                             </div>
                                             <div className="card-block table-border-style">
                                                 <div className="table-responsive">
@@ -463,16 +503,31 @@ class Rigs extends React.Component {
                                                         <thead>
                                                             <tr>
                                                                 <th style={{width:'10pt'}}></th>
-                                                                <th onClick={() => this.sortByHeader(rigs, 'computerName')}>
+                                                                <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'computerName')}>
                                                                     Miner Name&nbsp;
                                                                     {sortBy == 'computerName' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
                                                                     {sortBy == 'computerName' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
                                                                 </th>
-                                                                <th>Group</th>
-                                                                <th>Notes</th>
-                                                                <th>Hashrate</th>
+                                                                <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'groupName')}>
+                                                                    Group&nbsp;
+                                                                    {sortBy == 'groupName' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
+                                                                    {sortBy == 'groupName' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
+                                                                </th>
+                                                                <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'notes')}>
+                                                                    Notes&nbsp;
+                                                                    {sortBy == 'notes' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
+                                                                    {sortBy == 'notes' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
+                                                                </th>
+                                                                <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'totalHashrate')}>
+                                                                    Hashrate&nbsp;
+                                                                    {sortBy == 'totalHashrate' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
+                                                                    {sortBy == 'totalHashrate' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
+                                                                </th>
+                                                                <th>
+                                                                    Core/Mem
+                                                                </th>
                                                                 <th>Max ℃</th>
-                                                                <th onClick={() => this.sortByHeader(rigs, 'rigUpTime')}>
+                                                                <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'rigUpTime')}>
                                                                     UpTime&nbsp;
                                                                     {sortBy == 'rigUpTime' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
                                                                     {sortBy == 'rigUpTime' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
@@ -481,6 +536,7 @@ class Rigs extends React.Component {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            {isLoading && <tr><td colSpan='5'><IsLoading /></td></tr>}
                                                             {rigs && rigs.map((rig,i) => (
                                                             <tr key={rig._id}
                                                                 // className={rig.minutes > 125 ? 'alert alert-danger' : 'alert alert-success'}
@@ -488,23 +544,37 @@ class Rigs extends React.Component {
                                                                 // style={{'backgroundColor': ((Math.max(...rig.temperatures))>75 && (Math.max(...rig.temperatures))<=85) ? '#fff8e6' : (Math.max(...rig.temperatures))>85 ? '#ffece6' : ''}}
                                                                 >
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'info' : 'info'}>
+                                                                    {/* <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'info' : 'info'}>
                                                                         <div>
                                                                             <i className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
                                                                         </div>
                                                                         <div>
                                                                             {rig.minutes > 2 ? 'offline' : 'online'}
                                                                         </div>
-                                                                    </MappleToolTip>
+                                                                    </MappleToolTip> */}
+                                                                    <i data-tip data-for={`${rig._id}status`} className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
+                                                                    <ReactToolTip id={`${rig._id}status`} type="info"  >
+                                                                        <span>{rig.minutes > 2 ? 'offline' : 'online'}</span>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                                 <td>
-                                                                    <div>
-                                                                    {rig.isNameEdit && 
+                                                                    <span data-tip data-for={`${rig._id}name`}>{rig.computerName}</span>
+                                                                    <ReactToolTip id={`${rig._id}name`} type="info"  >
+                                                                        <ul>
+                                                                            <li>OS Version : {rig.osName}</li>
+                                                                            <li>Rig Id :</li>
+                                                                            <li>Lan IP : {rig.ip}</li>
+                                                                            <li>Public IP :</li>
+                                                                            <li>Gpu :</li>
+                                                                        </ul>
+                                                                    </ReactToolTip>
+                                                                    {/* <div> */}
+                                                                    {/* {rig.isNameEdit && 
                                                                         <form onSubmit={this.handleSubmit}>
                                                                             <input type="text" value={rig.computerName} onChange={this.handleNameChange} />
                                                                         </form>
-                                                                    }
-                                                                    {!rig.isNameEdit && <a>
+                                                                    } */}
+                                                                    {/* {!rig.isNameEdit && <a>
                                                                         <MappleToolTip float={true} direction={'bottom'} mappleType={'info'}>
                                                                             <div>
                                                                                 {rig.computerName}
@@ -519,25 +589,46 @@ class Rigs extends React.Component {
                                                                             </div>
                                                                         </MappleToolTip>
                                                                     </a>}
-                                                                    </div>
+                                                                    </div> */}
                                                                 </td>
                                                                 <td>{rig.groupName}</td>
                                                                 <td>
-                                                                    {rig.notes && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>}
-                                                                    {rig.notes == null && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>}
+                                                                    {rig.notes == '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
+                                                                    <span data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
+                                                                    <ReactToolTip id={`${rig._id}hashrate`} type="info"  >
+                                                                        <ul>
+                                                                            {rig.singleHashrate.map((hash,j) => (<li key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small></li>))}
+                                                                        </ul>
+                                                                    </ReactToolTip>
+                                                                    {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             <label className=''>{(rig.totalHashrate/1).toFixed(2)} MH/s</label>
                                                                         </div>
                                                                         <div>
                                                                             {rig.singleHashrate.map((hash,j) => (<span key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small><br /></span>))}
                                                                         </div>
-                                                                    </MappleToolTip>
+                                                                    </MappleToolTip> */}
                                                                 </td>
+                                                                <td></td>
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
+                                                                    <span data-tip data-for={`${rig._id}temp`}>
+                                                                        {this.styleMaxTemp(rig.temperatures)}
+                                                                        {Math.max(...rig.fanSpeeds)}&nbsp;%
+                                                                    </span>
+                                                                    <ReactToolTip id={`${rig._id}temp`} type="info"  >
+                                                                        <ul>
+                                                                            <li>
+                                                                                {rig.temperatures.map((temp,j)=> (<span key={(j+1)*3}>{temp}&nbsp;</span>))}
+                                                                            </li>
+                                                                            <li>
+                                                                            {rig.fanSpeeds.map((speed,j)=> (<span key={(j+1)*10}>{speed}&nbsp;</span>))}
+                                                                            </li>
+                                                                        </ul>
+                                                                    </ReactToolTip>
+                                                                    {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             {this.styleMaxTemp(rig.temperatures)}
                                                                             {Math.max(...rig.fanSpeeds)}&nbsp;%
@@ -550,14 +641,30 @@ class Rigs extends React.Component {
                                                                                 {rig.fanSpeeds.map((speed,j)=> (<span key={(j+1)*10}>{speed}&nbsp;</span>))}
                                                                             </span>%
                                                                         </div>
-                                                                    </MappleToolTip>
+                                                                    </MappleToolTip> */}
                                                                     {/* {rig.temperatures.map((temp,j)=> (<label key={(i+j+1)*102}>{temp}C&nbsp;&nbsp;</label>))}<br/>
                                                                     {rig.fanSpeeds.map((fan,j)=> (<label key={(i+j+1)*201}>{fan}%&nbsp;&nbsp;</label>))}<br/> */}
                                                                 </td>
                                                                 <td>
-                                                                    <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
+                                                                    <span data-tip data-for={`${rig._id}uptime`}>
+                                                                        {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
+                                                                        {rig.isOnline == 0 && '--'}
+                                                                    </span>
+                                                                    <ReactToolTip id={`${rig._id}uptime`} type="info"  >
+                                                                        <ul>
+                                                                            <li>
+                                                                                System Up Time : {moment(rig.serverTime).format('DD/MM/YYYY hh:mm')}
+                                                                            </li>
+                                                                            <li>
+                                                                                Miner Up Time : {rig.isOnline == 0 && '--'} {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
+                                                                            </li>
+                                                                            <li>
+                                                                                Last Seen : {this.formatLastSeen2(rig.updatedAt)}
+                                                                            </li>
+                                                                        </ul>
+                                                                    </ReactToolTip>
+                                                                    {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
-                                                                            {/* {moment(rig.updatedAt).format('MMM D YYYY h:mm:ss')} */}
                                                                             {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
                                                                             {rig.isOnline == 0 && '--'}
                                                                         </div>
@@ -565,30 +672,45 @@ class Rigs extends React.Component {
                                                                             <span>
                                                                                 System Up Time : {moment(rig.serverTime).format('DD/MM/YYYY hh:mm')}<br />
                                                                                 Miner Up Time : {rig.isOnline == 0 && '--'} {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)} <br/>
-                                                                                {/* Last Seen Seconds : {((new Date() - new Date(rig.updatedAt))/1000).toFixed(0)}&nbsp;sec<br /> */}
                                                                                 Last Seen : {this.formatLastSeen2(rig.updatedAt)}<br />
-                                                                                {/* {rig.updatedAt} */}
                                                                             </span>
                                                                         </div>
-                                                                    </MappleToolTip>
+                                                                    </MappleToolTip> */}
                                                                 </td>
                                                                 <td>
                                                                     {/* <i data-toggle="modal" data-id="id value" data-target="#default-Modal" className="fas fa-edit"></i>&nbsp;&nbsp; */}
-                                                                    <i className="fas fa-edit" s tyle={{cursor: 'pointer'}} onClick={() => this.handleModal(rig)}></i>&nbsp;&nbsp;
-                                                                    <i 
+                                                                    <i data-tip data-for={`${rig._id}minerName`} style={{cursor: 'pointer'}} className="fas fa-edit" onClick={() => this.handleModal(rig)}></i>&nbsp;&nbsp;
+                                                                    <ReactToolTip id={`${rig._id}minerName`}>
+                                                                        <span>Modify Miner name & group</span>
+                                                                    </ReactToolTip>
+
+
+                                                                    <i data-tip data-for={`${rig._id}minerReset`} 
                                                                         className={actionId== 2 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-sync-alt fa-spin' : 'fas fa-sync-alt'} 
-                                                                        onClick={() => this.setAction(rig, 2)} 
+                                                                        onClick={() => this.handleConfirmModalShow(rig, 2)} 
                                                                         style={{cursor: 'pointer', color: rig.action.filter(f=>f.actionId ==2).length > 0 ? 'red' : 'black'}} >
                                                                     </i>&nbsp;&nbsp;
-                                                                    <i className={actionId== 1 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-redo fa-spin' : 'fas fa-redo'} id="redo" 
-                                                                        onClick={() => this.setAction(rig, 1)} 
-                                                                        style={{cursor: 'pointer', color: rig.action.filter(f=>f.actionId ==1).length > 0 ? 'red' : 'black'}} 
-                                                                        tooltip="delete">
+                                                                    <ReactToolTip id={`${rig._id}minerReset`}>
+                                                                        <span>Reset Miner application</span>
+                                                                    </ReactToolTip>
+
+
+                                                                    <i data-tip data-for={`${rig._id}machineReset`} className={actionId== 1 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-recycle fa-spin' : 'fas fa-recycle'} id="redo" 
+                                                                        onClick={() => this.handleConfirmModalShow(rig, 1)} 
+                                                                        style={{cursor: 'pointer', color: rig.action.filter(f=>f.actionId ==1).length > 0 ? 'red' : 'black'}} >
                                                                     </i>&nbsp;&nbsp;
+                                                                    <ReactToolTip id={`${rig._id}machineReset`} >
+                                                                        <span>Restart Miner Machine</span>
+                                                                    </ReactToolTip>
+
+
                                                                     {rig.minutes > 2 && 
-                                                                        <i className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(rig)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                        <i data-tip data-for={`${rig._id}minerDelete`}  className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(rig)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
                                                                     {rig.minutes <= 2 && 
-                                                                        <i className="fas fa-trash-alt" style={{opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
+                                                                        <i data-tip data-for={`${rig._id}minerDelete`}  className="fas fa-trash-alt" style={{opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
+                                                                    <ReactToolTip id={`${rig._id}minerDelete`} >
+                                                                        <span>Delete Miner</span>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                             </tr>)
                                                             )}

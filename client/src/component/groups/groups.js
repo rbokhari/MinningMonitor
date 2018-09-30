@@ -1,8 +1,11 @@
 import React from 'react';
-//import toaster from 'react-toasty';
+import toastr from 'toastr';
+import ReactToolTip from 'react-tooltip';
+
 import MinerGroupModal from './addNewModal';
 import GroupDeleteModal from './groupDeleteModal';
 
+import { IsLoading } from '../common/';
 import Api from '../../api/Api';
 
 class Groups extends React.Component {
@@ -14,6 +17,7 @@ class Groups extends React.Component {
             showModal: false,
             showDeleteModal: false,
             group: {
+                isLoading: true,
                 name: '',
                 client: 0,
                 config: '',
@@ -43,6 +47,7 @@ class Groups extends React.Component {
 
     getData() {
         //toastr.info('Getting data !');
+        this.setState({isLoading: true});
         Api.get('client')
             .then(res => res.json())
             .then(data => {
@@ -51,7 +56,7 @@ class Groups extends React.Component {
                     .then(res => res.json())
                     .then(group => {
                         console.info('group data', group);
-                        this.setState({groups: group});
+                        this.setState({groups: group, isLoading: false});
                     }, err => {
                         console.error('error', err);
                     });
@@ -152,7 +157,7 @@ class Groups extends React.Component {
 
 
     render() {
-        const { showModal, group, clients, groups, showDeleteModal, miners } = this.state;
+        const { showModal, group, clients, groups, showDeleteModal, miners, isLoading } = this.state;
         return (
             <div className="pcoded-content">
                 <GroupDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
@@ -188,7 +193,9 @@ class Groups extends React.Component {
                                                 <h5>Miner Groups</h5>
                                                 <span></span> 
                                                 <div className="card-header-right">
-                                                    <button className="btn btn-primary" onClick={(e) => this.handleModalShow(e)}><i className="fa fa-plus"></i>&nbsp; Add New</button> 
+                                                    <button className="btn btn-primary" onClick={(e) => this.handleModalShow(e)}>
+                                                        <i className="fas fa-plus-square" style={{color:'white'}}></i>&nbsp;Add New
+                                                    </button> 
                                                 </div>
 
                                             </div>
@@ -206,6 +213,7 @@ class Groups extends React.Component {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            {isLoading && <tr><td colSpan="6"><IsLoading /></td></tr>}
                                                             {groups && groups.map((gp, i) => (<tr key={i+1}>
                                                                 <td>{gp.group.name}</td>
                                                                 <td>{gp.group.notes}</td>
@@ -220,9 +228,17 @@ class Groups extends React.Component {
                                                                     <p>{gp.group.configuration.length > 50 ? gp.group.configuration.substring(1, 50) + '  ...' : gp.group.configuration}</p>
                                                                 </td>
                                                                 <td>
-                                                                    <i className="fas fa-edit" onClick={() => this.handleEditModalShow(gp.group)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
-                                                                    {gp.miner.length == 0 && <i className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(gp.group)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
-                                                                    {gp.miner.length > 0 && <i className="fas fa-trash-alt" style={{cursor: 'pointer', opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
+                                                                    <i className="fas fa-edit" data-tip data-for={`${gp._id}edit`} onClick={() => this.handleEditModalShow(gp.group)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
+                                                                    <ReactToolTip id={`${gp._id}edit`}>
+                                                                        <span>Update Group</span>
+                                                                    </ReactToolTip>
+
+                                                                    {gp.miner.length == 0 && <i  data-tip data-for={`${gp._id}delete`} className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(gp.group)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {gp.miner.length > 0 && <i data-tip data-for={`${gp._id}delete`} className="fas fa-trash-alt" style={{cursor: 'pointer', opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
+
+                                                                    <ReactToolTip id={`${gp._id}delete`} >
+                                                                        <span>Delete Group</span>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                             </tr>))}
                                                         </tbody>

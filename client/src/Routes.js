@@ -8,7 +8,7 @@ import { MinerClient } from './component/minerClient';
 
 const Routes = () => (
     <Switch>
-        <Route path="/" exact activeClassName='active' component={Dashboard} />
+        <Route path="/" exact activeClassName='active' component={Rigs} />
         <Route path="/miners" component={Rigs} />
         <Route path="/groups" component={Groups} />
         <Route path="/clients" component={MinerClient} />

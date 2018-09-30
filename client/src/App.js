@@ -18,7 +18,6 @@ class App extends Component {
         return (
         <Router>
             <div id="pcoded" className="pcoded">
-                
                 <div className="pcoded-overlay-box"></div>
                 <div className="pcoded-container navbar-wrapper">
                     <Header />
