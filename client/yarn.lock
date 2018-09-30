@@ -6603,10 +6603,6 @@ react@^16.4.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-reactjs-mappletooltip@^1.4.63:
-  version "1.4.63"
-  resolved "https://registry.yarnpkg.com/reactjs-mappletooltip/-/reactjs-mappletooltip-1.4.63.tgz#71ec049763aa5eb1725fafdd98d6dcb63bf2c936"
-
 reactpopupmodal@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/reactpopupmodal/-/reactpopupmodal-0.1.4.tgz#0bc13576eea71fb8d6f17648350cd9b37ee43e2b"
