@@ -6,7 +6,7 @@ const ConfirmModal = ({isOpen, title, message, onHandleSubmit, onHandleClose}) =
     if (!isOpen) return (null);
     return (
         <Modal isOpen={isOpen}>
-            <form onSubmit={onHandleSubmit}>
+            <form>
                 <ModalHeader>{title}</ModalHeader>
                 <ModalBody>
                     <p>
@@ -15,7 +15,7 @@ const ConfirmModal = ({isOpen, title, message, onHandleSubmit, onHandleClose}) =
                     
                 </ModalBody>
                 <ModalFooter>
-                    <input type="submit" value="confirm" color="primary" className="btn btn-primary pull-right" />
+                    <Button type="button" onClick={onHandleSubmit} value="confirm" color="primary" className="btn btn-primary pull-right">Submit</Button>
                     <Button color="default" onClick={onHandleClose} >Cancel</Button>
                 </ModalFooter>
             </form>

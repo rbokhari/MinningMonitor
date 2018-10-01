@@ -72,7 +72,9 @@ export class RigRouter {
         const shares: string = req.body.t_shares;
         const invalidShares: string = req.body.i_shares;
         const singleHashrate = req.body.gpu;
-        const serverTime = req.body.serverTime
+        const serverTime = req.body.serverTime;
+        const core = req.body.cores;
+        const memory = req.body.memory;
 
         const temperatures = req.body.temps.map(t=> t);
         const fanSpeeds = req.body.fans.map(f => f);
@@ -91,7 +93,9 @@ export class RigRouter {
             temperatures,
             fanSpeeds,
             email,
-            serverTime
+            serverTime,
+            core,
+            memory
         });
 
         rig.save()
@@ -120,6 +124,8 @@ export class RigRouter {
         const rigUpTime = parseInt(req.body.rigUpTime);
         const temperatures = req.body.temps.map(t=> t);
         const fanSpeeds = req.body.fans.map(f => f);
+        const core = req.body.cores;
+        const memory = req.body.memory;
 
         const perform_action = req.body.performAction;
 
@@ -138,7 +144,10 @@ export class RigRouter {
             fanSpeeds,
             email,
             updatedAt,
-            rigUpTime
+            rigUpTime,
+            core,
+            memory
+            
         };
 
         if (perform_action != 0) {

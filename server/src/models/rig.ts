@@ -55,7 +55,8 @@ export const RigSchema: Schema = new Schema({
     singleHashrate: [Number],
     temperatures: [Number],
     fanSpeeds: [Number],
-    coreMemory: [Number],
+    core: [Number],
+    memory: [Number],
     shares: {
         type: Number,
         default: 0

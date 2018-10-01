@@ -202,7 +202,7 @@ class Rigs extends React.Component {
                 this.setState({groups: groups});
                 Api.get('rigs')
                     .then(res => res.json())
-                    .then(data => {
+                    .then(data =>    {
                         console.info('data', data);
                         const rigs = data
                             .map(rig => {
@@ -223,7 +223,9 @@ class Rigs extends React.Component {
                         let sortRigs = this.sorting(rigs, '')
                         //this.setState((prevState, props) => ({rigs: sortRigs}));
                     })
-                    .catch(err => console.error('fetch error', err));
+                    .catch(err => {
+                        console.error('fetch error', err);
+                    });
             }, err => {
                 console.error('loading rig data error', err);
              })
@@ -401,9 +403,31 @@ class Rigs extends React.Component {
         this.setState({isConfirmModal: true, rig: rig, actionId: actionId});
     }
 
-    handleConfirmSubmit(rig, actionId) {
-        alert('alert');
-        this.setAction(rig, actionId);
+    handleConfirmSubmit() {
+        
+        const { rig, actionId} = this.state;
+
+        const action = {
+            rig: rig._id,
+            action: actionId,
+            status: 1
+        };
+        let msg = '';
+        
+        if (actionId == 1) msg = `Machine ${rig.computerName} Restart action added`
+        else if (actionId == 2) msg = `Miner ${rig.computerName} Reset action added.`
+
+        this.setState({ actionId: actionId, actionPosting: 1, actionRigId: rig._id});
+        Api.post('actions', action)
+            .then(res => {
+                toastr.success(msg, 'Success !');
+                this.setState({ isConfirmModal: false, actionId: 0, actionPosting: 0, actionRigId: ''});
+                this.getData();
+            })
+            .catch(err => {
+                toastr.error('Error occured !', 'Error');
+                console.error('action error', err);
+            });
     }
 
     handleConfirmClose() {
@@ -415,8 +439,8 @@ class Rigs extends React.Component {
             actionId, actionPosting, actionRigId, isConfirmModal } = this.state;
         
         var msg = '';
-        if (actionId==1) msg = `Are you sure to reset machine : ${rig.computerName} ?`;
-        else if (actionId==2) msg = `Are you sure to reset miner : ${rig.computerName} ?`
+        if (actionId==1) msg = `Are you sure to restart miner machine : ${rig.computerName} ?`;
+        else if (actionId==2) msg = `Are you sure to reset miner application : ${rig.computerName} ?`
 
         return (<div>
             <div className="pcoded-content">
@@ -612,7 +636,16 @@ class Rigs extends React.Component {
                                                                         </div>
                                                                     </MappleToolTip> */}
                                                                 </td>
-                                                                <td></td>
+                                                                <td>
+                                                                    <ul>
+                                                                        <li>
+                                                                            {rig.core && rig.core.map((core,j)=> (<span key={(j+1)*3}>{core}&nbsp;</span>))}
+                                                                        </li>
+                                                                        <li>
+                                                                            {rig.memory && rig.memory.map((mem,j)=> (<span key={(j+1)*3}>{mem}&nbsp;</span>))}
+                                                                        </li>
+                                                                    </ul>
+                                                                </td>
                                                                 <td>
                                                                     <span data-tip data-for={`${rig._id}temp`}>
                                                                         {this.styleMaxTemp(rig.temperatures)}

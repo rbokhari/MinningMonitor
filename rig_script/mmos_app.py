@@ -14,7 +14,7 @@ import platform
 #uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 uri = "http://mmosapi.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
-OS_VERSION=10001
+OS_VERSION='1.0.0'
 
 # firebase = firebase.FirebaseApplication('https://genesuspool.firebaseio.com/')
 miner_ip = '127.0.0.1'
@@ -58,9 +58,10 @@ def get_data():
 
 def avg_hashrate_1min():
     hashrates = []
+    
     for i in range(0, 2):
         data = get_data()
-        print(i)
+        print('*')
         try:
             hashrate = data['result'][2].split(';')[0]
         except Exception as e:
@@ -123,16 +124,20 @@ def init():
         #{"result": ["7.3", "19", "16212;7;0", "16212", "0;0;0", "0", "74;30", "us1.ethermine.org:4444", "0;0;0;7"]}
         #u'result': [u'10.6 - ETH', u'76', u'25940;31;0', u'25940', u'0;0;0', u'off', u'45;80', u'eu1.ethermine.org:4444', u'0;0;0;0']}
         #{'id': 0, 'result': ['11.9 - ETH', '4332', '54611;3461;1', '26238;28373', '0;0;0', 'off;off', '39;80;44;80', 'eu1.ethermine.org:4444', '0;0;0;0'], 'error': None}
+        cards = stats_count() # len(temps)
+        cores = stats_core()
+        memory = stats_memory()
+        temps = stats_temp() #  all[::2]
+        fans = stats_fan() # all[1::2]
+
         isMinerRunning = (len(data) > 0)
         if (isMinerRunning):
             all = data['result'][6].split(';')
             gpus = data['result'][3].split(';')
-            temps = all[::2]
-            fans = all[1::2]
             total_shares = int(data['result'][2].split(';')[1])
             invalid_shares = int(data['result'][8].split(';')[0])
             miner_uptime = data['result'][1]
-            cards = len(temps)
+            
             #temp = ';'.join(temps) #str(temps)
             #fan = ';'.join(fans) #str(fans)
 
@@ -183,9 +188,9 @@ def init():
                 os.remove("mmos_action.txt")
 
             if isMinerRunning:
-                rig = { 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+                rig = { 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             else:
-                rig = { 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osName', OS_VERSION: 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': [], 'fans': [], 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
+                rig = { 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osName', OS_VERSION: 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
             try:
                 response = requests.put(uri + '/' + id, json=rig)
                 if response.status_code != requests.codes.ok: # 201:
@@ -193,7 +198,6 @@ def init():
                 #if response.status_code == requests.codes.ok: # 201:
                     #print('Updated Rig. ID: {}'.format(response.json()))
                 result = response.json()
-                print(result)
                 comp_name = result['rigReturn']['computer']
                 save_name_to_file(comp_name)
                 actions = result['rigReturn']['action']
@@ -213,15 +217,13 @@ def init():
 
         else:
             #result = register_rig()
-            rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+            rig = { 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans,'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             try:
                 response = requests.post(uri, json=rig)
                 if response.status_code != requests.codes.created: # 200:
                     print('error occured create', response.status_code)
                 print('Created Rig. ID: {}'.format(response.json()))
                 result = response.json()
-                print('-------')
-                print(result['data'])
                 save_id_to_file(result['data']["_id"])
             except requests.exceptions.ConnectionError as e:
                 print('Connection failed.')
@@ -278,26 +280,85 @@ def read_email_from_file():
     f.close()
     return email
 
+def stats_core():
+    f = Path("/home/mmos/tmp/stats_gpu_core")
+    if f.is_file():
+        d = open("/home/mmos/tmp/stats_gpu_core")
+        cores = d.read()
+        d.close()
+        cores = cores.strip()
+        cores = cores.split("  ")
+        #cores = map(int, cores)
+        return cores
+    return []
+
+def stats_memory():
+    f = Path("/home/mmos/tmp/stats_gpu_memory")
+    if f.is_file():
+        d = open("/home/mmos/tmp/stats_gpu_memory")
+        memory = d.read()
+        d.close()
+        memory = memory.strip()
+        memory = memory.split("  ")
+        #memory = map(int, memory)
+        return memory
+    return []
+
+def stats_fan():
+    f = Path("/home/mmos/tmp/stats_gpu_fanspeed")
+    if f.is_file():
+        d = open("/home/mmos/tmp/stats_gpu_fanspeed")
+        fans = d.read()
+        d.close()
+        fans = fans.strip()
+        fans = fans.split(" ")
+        #fans = map(int, fans)
+        return fans
+    return []
+
+def stats_temp():
+    f = Path("/home/mmos/tmp/stats_gpu_temp")
+    if f.is_file():
+        d = open("/home/mmos/tmp/stats_gpu_temp")
+        temps = d.read()
+        d.close()
+        temps = temps.strip()
+        temps = temps.split(" ")
+        #temps = map(int, temps)
+        return temps
+    return []
+
+def stats_count():
+    f = Path("/home/mmos/tmp/stats_gpu_count")
+    if f.is_file():
+        d = open("/home/mmos/tmp/stats_gpu_count")
+        counts = d.read()
+        d.close()
+        return counts
+    return 0
+
 def execute_actions(actions):
     print('action found')
     if len(actions) > 0:
         action_id = actions[0]['action']
         if action_id == 1:
-            execute_reboot()
+            f = Path("mmos_action.txt")
+            if f.is_file():
+                os.remove("mmos_action.txt")
+                execute_reboot()
         elif (action_id == 2):
             execute_miner_reset()
 
 
 def execute_reboot():
-    os.system('sudo ./force_reboot.sh')
+    os.system('apps/force_reboot.sh')
 
 def execute_miner_reset():
     print('reset action')
     f = open("mmos_action.txt", "w+")
     f.write(str(2))
     f.close()
-    print('file created')
-    os.system('su mmos ./miner_restart.sh')
+    os.system('./miner_restart.sh')
 
 if __name__ == '__main__':
     init()
