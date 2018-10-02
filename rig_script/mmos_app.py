@@ -132,7 +132,7 @@ def init():
 
         isMinerRunning = (len(data) > 0)
         if (isMinerRunning):
-            all = data['result'][6].split(';')
+            #all = data['result'][6].split(';')
             gpus = data['result'][3].split(';')
             total_shares = int(data['result'][2].split(';')[1])
             invalid_shares = int(data['result'][8].split(';')[0])
@@ -142,7 +142,7 @@ def init():
             #fan = ';'.join(fans) #str(fans)
 
             print('-----------------START------------------')
-            print('Number of active cards: ' + str(cards))
+            #print('Number of active cards: ' + str(cards))
             # print('GPU temp: ' + str(temp))
             #print('GPU s : ' + gpus)
             # print('Fan speed (%): ' + str(fan))
@@ -191,6 +191,7 @@ def init():
                 rig = { 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': OS_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
             else:
                 rig = { 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  'osName': 'osName', OS_VERSION: 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
+            
             try:
                 response = requests.put(uri + '/' + id, json=rig)
                 if response.status_code != requests.codes.ok: # 201:
@@ -201,7 +202,6 @@ def init():
                 comp_name = result['rigReturn']['computer']
                 save_name_to_file(comp_name)
                 actions = result['rigReturn']['action']
-                print(actions)
                 if len(actions) > 0:
                     execute_actions(actions)
                     time.sleep(15) 
@@ -341,23 +341,33 @@ def execute_actions(actions):
     print('action found')
     if len(actions) > 0:
         action_id = actions[0]['action']
+        print(action_id)
         if action_id == 1:
-            f = Path("mmos_action.txt")
-            if f.is_file():
-                os.remove("mmos_action.txt")
-                execute_reboot()
+            print('restart action')
+            # f = Path("mmos_action.txt")
+            # if f.is_file():
+            #     os.remove("mmos_action.txt")
+            execute_reboot()
+            print('restart action happened')
         elif (action_id == 2):
             execute_miner_reset()
 
 
 def execute_reboot():
+    f = open("mmos_action.txt", "w+")
+    f.write(str(1))
+    f.close()
+    time.sleep(15)
+    run_reboot()
+
+def run_reboot():    
     os.system('apps/force_reboot.sh')
 
 def execute_miner_reset():
-    print('reset action')
     f = open("mmos_action.txt", "w+")
     f.write(str(2))
     f.close()
+    time.sleep(10)
     os.system('./miner_restart.sh')
 
 if __name__ == '__main__':
