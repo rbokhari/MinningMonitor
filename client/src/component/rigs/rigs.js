@@ -27,7 +27,7 @@ class Rigs extends React.Component {
             isConfirmFail: false,
             isLoading: true,
             sortBy: 'computerName',
-            sortDirection: 1,
+            sortDirection: 0,
             actionId: 0,
             actionPosting: 0,
             actionRigId: '',
@@ -167,6 +167,8 @@ class Rigs extends React.Component {
         Api.put(`rigs/${rig._id}/name`, {'name': rig.computerName, 'group': rig.group})
             .then(res => {
                 this.handleModalClose();
+                this.setState({rig: rig, actionId: 1});
+                this.setAction(rig, 2);
                 this.getData();
                 toastr.success('Name / Group changed!', 'Success !');
             })
@@ -303,7 +305,7 @@ class Rigs extends React.Component {
         };
         let msg = '';
         
-        if (actionId == 1) msg = `Machine ${rig.computerName} Reset action added`
+        if (actionId == 1) msg = `Machine ${rig.computerName} Restart action added`
         else if (actionId == 2) msg = `Miner ${rig.computerName} Reset action added.`
 
         this.setState({ actionId: actionId, actionPosting: 1, actionRigId: rig._id});
@@ -586,10 +588,9 @@ class Rigs extends React.Component {
                                                                     <ReactToolTip id={`${rig._id}name`} type="info"  >
                                                                         <ul>
                                                                             <li>OS Version : {rig.osName}</li>
-                                                                            <li>Rig Id :</li>
+                                                                            <li>Miner ID :</li>
                                                                             <li>Lan IP : {rig.ip}</li>
                                                                             <li>Public IP :</li>
-                                                                            <li>Gpu :</li>
                                                                         </ul>
                                                                     </ReactToolTip>
                                                                     {/* <div> */}
@@ -621,12 +622,19 @@ class Rigs extends React.Component {
                                                                     {rig.notes == '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
-                                                                    <span data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
-                                                                    <ReactToolTip id={`${rig._id}hashrate`} type="info"  >
-                                                                        <ul>
-                                                                            {rig.singleHashrate.map((hash,j) => (<li key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small></li>))}
-                                                                        </ul>
-                                                                    </ReactToolTip>
+                                                                    <ul>
+                                                                        <li>
+                                                                            <span data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
+                                                                            <ReactToolTip id={`${rig._id}hashrate`} type="info"  >
+                                                                                <ul>
+                                                                                    {rig.singleHashrate.map((hash,j) => (<li key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small></li>))}
+                                                                                </ul>
+                                                                            </ReactToolTip>
+                                                                        </li>
+                                                                        <li>
+                                                                            <span>({rig.singleHashrate.length})</span>
+                                                                        </li>
+                                                                    </ul>
                                                                     {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
                                                                         <div>
                                                                             <label className=''>{(rig.totalHashrate/1).toFixed(2)} MH/s</label>
@@ -693,6 +701,9 @@ class Rigs extends React.Component {
                                                                             </li>
                                                                             <li>
                                                                                 Last Seen : {this.formatLastSeen2(rig.updatedAt)}
+                                                                            </li>
+                                                                            <li>
+                                                                                Miner Restart Count : 0
                                                                             </li>
                                                                         </ul>
                                                                     </ReactToolTip>

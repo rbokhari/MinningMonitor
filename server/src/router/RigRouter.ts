@@ -115,7 +115,6 @@ export class RigRouter {
         const email: string = req.body.email;
         const ip: string = req.body.ip;
         const kernelName: string = req.body.kernel;
-        const computerName: string = req.body.worker;
         const totalHashrate: string = req.body.totalHashrate;
         const shares: string = req.body.t_shares;
         const invalidShares: string = req.body.i_shares;
@@ -134,7 +133,6 @@ export class RigRouter {
             osName,
             ip,
             kernelName,
-            //computerName,
             totalHashrate,
             singleHashrate,
             shares,

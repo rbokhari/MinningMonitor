@@ -14,7 +14,7 @@ import platform
 #uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 uri = "http://mmosapi.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
-OS_VERSION='1.0.0'
+OS_VERSION='1.0.1'
 
 # firebase = firebase.FirebaseApplication('https://genesuspool.firebaseio.com/')
 miner_ip = '127.0.0.1'
@@ -263,10 +263,23 @@ def save_name_to_file(name):
     f.write(name)
     f.close()
 
-def save_group_config_to_file(name):
-    f = open("group_config.txt", "w+")
-    f.write(name)
+def save_group_config_to_file(config):
+    p = Path("group_config.json")
+    if p.is_file():
+        fi = open("group_config.json", "r")
+        data = fi.read()
+
+        if data == config:
+            fi.close()
+            return
+        else:
+            fi.close()
+
+    f = open("group_config.json", "w+")
+    f.write(config)
     f.close()
+    time.sleep(20)
+    os.system('./miner_restart.sh')
 
 def read_id_from_file():
     f = open("id.txt", "r")
@@ -281,9 +294,9 @@ def read_email_from_file():
     return email
 
 def stats_core():
-    f = Path("/home/mmos/tmp/stats_gpu_core")
+    f = Path("/home/miner/tmp/stats_gpu_core")
     if f.is_file():
-        d = open("/home/mmos/tmp/stats_gpu_core")
+        d = open("/home/miner/tmp/stats_gpu_core")
         cores = d.read()
         d.close()
         cores = cores.strip()
@@ -293,9 +306,9 @@ def stats_core():
     return []
 
 def stats_memory():
-    f = Path("/home/mmos/tmp/stats_gpu_memory")
+    f = Path("/home/miner/tmp/stats_gpu_memory")
     if f.is_file():
-        d = open("/home/mmos/tmp/stats_gpu_memory")
+        d = open("/home/miner/tmp/stats_gpu_memory")
         memory = d.read()
         d.close()
         memory = memory.strip()
@@ -305,9 +318,9 @@ def stats_memory():
     return []
 
 def stats_fan():
-    f = Path("/home/mmos/tmp/stats_gpu_fanspeed")
+    f = Path("/home/miner/tmp/stats_gpu_fanspeed")
     if f.is_file():
-        d = open("/home/mmos/tmp/stats_gpu_fanspeed")
+        d = open("/home/miner/tmp/stats_gpu_fanspeed")
         fans = d.read()
         d.close()
         fans = fans.strip()
@@ -317,9 +330,9 @@ def stats_fan():
     return []
 
 def stats_temp():
-    f = Path("/home/mmos/tmp/stats_gpu_temp")
+    f = Path("/home/miner/tmp/stats_gpu_temp")
     if f.is_file():
-        d = open("/home/mmos/tmp/stats_gpu_temp")
+        d = open("/home/miner/tmp/stats_gpu_temp")
         temps = d.read()
         d.close()
         temps = temps.strip()
@@ -329,16 +342,15 @@ def stats_temp():
     return []
 
 def stats_count():
-    f = Path("/home/mmos/tmp/stats_gpu_count")
+    f = Path("/home/miner/tmp/stats_gpu_count")
     if f.is_file():
-        d = open("/home/mmos/tmp/stats_gpu_count")
+        d = open("/home/miner/tmp/stats_gpu_count")
         counts = d.read()
         d.close()
         return counts
     return 0
 
 def execute_actions(actions):
-    print('action found')
     if len(actions) > 0:
         action_id = actions[0]['action']
         print(action_id)
