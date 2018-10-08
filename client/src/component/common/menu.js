@@ -37,6 +37,14 @@ const Menu = () => (
                         </NavLink>
                     </li>
                 </ul>
+                <ul className="pcoded-item pcoded-left-item">
+                    <li className="">
+                        <NavLink to="/wallet" className="waves-effect waves-dark">
+                            <span className="pcoded-micon"><i className="fas fa-briefcase"></i></span>
+                            <span>Wallet</span>
+                        </NavLink>
+                    </li>
+                </ul>
                 {/* <ul className="pcoded-item pcoded-left-item">
                     <li className="">
                         <NavLink to="/clients" className="waves-effect waves-dark">

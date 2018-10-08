@@ -12,7 +12,7 @@ from pathlib import Path
 import platform
 
 #uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
-uri = "http://mmosapi.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+uri = "http://srv.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
 OS_VERSION='1.0.1'
 
@@ -171,7 +171,7 @@ def init():
         id_file = Path("id.txt")
         action_file = Path("mmos_action.txt")
         action_perform = 0
-        client_email = Path("gns_config.txt")
+        client_email = Path("/mnt/user/email.txt") # gns_config.txt
         if client_email.is_file():
             register_email = read_email_from_file()
 
@@ -264,9 +264,9 @@ def save_name_to_file(name):
     f.close()
 
 def save_group_config_to_file(config):
-    p = Path("group_config.json")
+    p = Path("/home/miner/config.json")
     if p.is_file():
-        fi = open("group_config.json", "r")
+        fi = open("/home/miner/config.json", "r")
         data = fi.read()
 
         if data == config:
@@ -275,7 +275,7 @@ def save_group_config_to_file(config):
         else:
             fi.close()
 
-    f = open("group_config.json", "w+")
+    f = open("/home/miner/config.json", "w+")
     f.write(config)
     f.close()
     time.sleep(20)
@@ -288,15 +288,15 @@ def read_id_from_file():
     return id
 
 def read_email_from_file():
-    f = open("gns_config.txt", "r")
+    f = open("/mnt/user/email.txt", "r")
     email = f.read()
     f.close()
     return email
 
 def stats_core():
-    f = Path("/home/miner/tmp/stats_gpu_core")
+    f = Path("/var/tmp/stats_gpu_core")
     if f.is_file():
-        d = open("/home/miner/tmp/stats_gpu_core")
+        d = open("/var/tmp/stats_gpu_core")
         cores = d.read()
         d.close()
         cores = cores.strip()
@@ -306,9 +306,9 @@ def stats_core():
     return []
 
 def stats_memory():
-    f = Path("/home/miner/tmp/stats_gpu_memory")
+    f = Path("/var/tmp/stats_gpu_memory")
     if f.is_file():
-        d = open("/home/miner/tmp/stats_gpu_memory")
+        d = open("/var/tmp/stats_gpu_memory")
         memory = d.read()
         d.close()
         memory = memory.strip()
@@ -318,9 +318,9 @@ def stats_memory():
     return []
 
 def stats_fan():
-    f = Path("/home/miner/tmp/stats_gpu_fanspeed")
+    f = Path("/var/tmp/stats_gpu_fanspeed")
     if f.is_file():
-        d = open("/home/miner/tmp/stats_gpu_fanspeed")
+        d = open("/var/tmp/stats_gpu_fanspeed")
         fans = d.read()
         d.close()
         fans = fans.strip()
@@ -330,9 +330,9 @@ def stats_fan():
     return []
 
 def stats_temp():
-    f = Path("/home/miner/tmp/stats_gpu_temp")
+    f = Path("/var/tmp/stats_gpu_temp")
     if f.is_file():
-        d = open("/home/miner/tmp/stats_gpu_temp")
+        d = open("/var/tmp/stats_gpu_temp")
         temps = d.read()
         d.close()
         temps = temps.strip()
@@ -342,9 +342,9 @@ def stats_temp():
     return []
 
 def stats_count():
-    f = Path("/home/miner/tmp/stats_gpu_count")
+    f = Path("/var/tmp/stats_gpu_count")
     if f.is_file():
-        d = open("/home/miner/tmp/stats_gpu_count")
+        d = open("/var/tmp/stats_gpu_count")
         counts = d.read()
         d.close()
         return counts
