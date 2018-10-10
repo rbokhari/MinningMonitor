@@ -75,6 +75,11 @@ export class RigRouter {
         const serverTime = req.body.serverTime;
         const core = req.body.cores;
         const memory = req.body.memory;
+        const wanIp = req.body.wanIp || '';
+        const gpuModel = req.body.gpuModel || '';
+        const appVersion = req.body.appVersion || '';
+        const rigId = req.body.rigId || '';
+
 
         const temperatures = req.body.temps.map(t=> t);
         const fanSpeeds = req.body.fans.map(f => f);
@@ -95,7 +100,11 @@ export class RigRouter {
             email,
             serverTime,
             core,
-            memory
+            memory,
+            wanIp,
+            gpuModel,
+            appVersion,
+            rigId
         });
 
         rig.save()
@@ -125,6 +134,10 @@ export class RigRouter {
         const fanSpeeds = req.body.fans.map(f => f);
         const core = req.body.cores;
         const memory = req.body.memory;
+        const wanIp = req.body.wanIp || '';
+        const gpuModel = req.body.gpuModel || '';
+        const appVersion = req.body.appVersion || '';
+        const rigId = req.body.rigId || '';
 
         const perform_action = req.body.performAction;
 
@@ -144,8 +157,11 @@ export class RigRouter {
             updatedAt,
             rigUpTime,
             core,
-            memory
-            
+            memory,
+            wanIp,
+            gpuModel,
+            appVersion,
+            rigId
         };
 
         if (perform_action != 0) {

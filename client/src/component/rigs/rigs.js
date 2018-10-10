@@ -11,12 +11,6 @@ import RigNoteModal from './rigNoteModal';
 
 require('../../toastr.min.css');
 
-const styles = {
-    'danger': {
-
-    }
-};
-
 class Rigs extends React.Component {
 
     constructor(props) {
@@ -43,12 +37,14 @@ class Rigs extends React.Component {
             interval: 1000*30   // 30 seconds
         };
         this.getData = this.getData.bind(this);
+        this.refreshData = this.refreshData.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleModal = this.handleModal.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.calculateMining = this.calculateMining.bind(this);
+        this.countActiveGpu = this.countActiveGpu.bind(this);
         
         this.handleDeleteModal = this.handleDeleteModal.bind(this);
         this.handleDeleteClose = this.handleDeleteClose.bind(this);
@@ -195,6 +191,11 @@ class Rigs extends React.Component {
         let { rig } = this.state;
         rig[e.target.name] = e.target.value;
         this.setState({ rig: rig });
+    }
+
+    refreshData() {
+        this.setState({rigs: [], isLoading: true});
+        this.getData();
     }
 
     getData() {
@@ -392,6 +393,13 @@ class Rigs extends React.Component {
         return total;
     }
 
+    countActiveGpu() {
+        const { rigs } = this.state;
+        let tCount = rigs.reduce((a,b) => (a + parseFloat(b.singleHashrate.length)), 0);
+        let aCount = rigs.reduce((a,b) => (a + (b.totalHashrate > 0 ? parseFloat(b.singleHashrate.length) : 0)), 0);
+        return `${aCount} / ${tCount}`;
+    }
+
     styleMaxTemp(temps) {
         if (typeof temps == undefined) return;
         if (temps == null) return;
@@ -488,7 +496,7 @@ class Rigs extends React.Component {
                                         <div className="card o-hidden bg-c-green web-num-card">
                                             <div className="card-block text-white">
                                                 <h5 className="m-t-15">Active GPU</h5>
-                                                <h3 className="m-b-15">0</h3>
+                                                <h3 className="m-b-15">{this.countActiveGpu()}</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -510,7 +518,6 @@ class Rigs extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                         
                                 <div className="row">
@@ -520,7 +527,9 @@ class Rigs extends React.Component {
                                                 <h5>Miners </h5>
                                                 <span>click headers to sort accordingly</span> 
                                                 <div className="card-header-right">
-                                                    <i className="fas fa-plus-square" onClick={(e) => this.getData(e)} style={{color:'white'}}></i>Refresh
+                                                    <ul className="list-unstyled card-option">
+                                                        <li className="first-opt" ><i onClick={(e) => this.getData(e)} className="fas fa-sync-alt"></i></li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                             <div className="card-block table-border-style">
@@ -570,14 +579,6 @@ class Rigs extends React.Component {
                                                                 // style={{'backgroundColor': ((Math.max(...rig.temperatures))>75 && (Math.max(...rig.temperatures))<=85) ? '#fff8e6' : (Math.max(...rig.temperatures))>85 ? '#ffece6' : ''}}
                                                                 >
                                                                 <td>
-                                                                    {/* <MappleToolTip float={true} direction={'bottom'} mappleType={rig.minutes > 2 ? 'info' : 'info'}>
-                                                                        <div>
-                                                                            <i className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
-                                                                        </div>
-                                                                        <div>
-                                                                            {rig.minutes > 2 ? 'offline' : 'online'}
-                                                                        </div>
-                                                                    </MappleToolTip> */}
                                                                     <i data-tip data-for={`${rig._id}status`} className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
                                                                     <ReactToolTip id={`${rig._id}status`} type="info"  >
                                                                         <span>{rig.minutes > 2 ? 'offline' : 'online'}</span>
@@ -588,9 +589,11 @@ class Rigs extends React.Component {
                                                                     <ReactToolTip id={`${rig._id}name`} type="info"  >
                                                                         <ul>
                                                                             <li>OS Version : {rig.osName}</li>
-                                                                            <li>Miner ID :</li>
+                                                                            <li>APP Version : {rig.appVersion}</li>
+                                                                            <li>Miner ID : {rig.rigId}</li>
                                                                             <li>Lan IP : {rig.ip}</li>
-                                                                            <li>Public IP :</li>
+                                                                            <li>Public IP : {rig.wanIp}</li>
+                                                                            <li>GPU Model : {rig.gpuModel}</li>
                                                                         </ul>
                                                                     </ReactToolTip>
                                                                     {/* <div> */}
@@ -599,22 +602,6 @@ class Rigs extends React.Component {
                                                                             <input type="text" value={rig.computerName} onChange={this.handleNameChange} />
                                                                         </form>
                                                                     } */}
-                                                                    {/* {!rig.isNameEdit && <a>
-                                                                        <MappleToolTip float={true} direction={'bottom'} mappleType={'info'}>
-                                                                            <div>
-                                                                                {rig.computerName}
-                                                                                
-                                                                            </div>
-                                                                            <div>
-                                                                                OS Version : <br/>
-                                                                                Rig Id : <br/>
-                                                                                Lan IP : {rig.ip}<br/>
-                                                                                Public IP : <br/> 
-                                                                                Gpu :
-                                                                            </div>
-                                                                        </MappleToolTip>
-                                                                    </a>}
-                                                                    </div> */}
                                                                 </td>
                                                                 <td>{rig.groupName}</td>
                                                                 <td>
@@ -622,27 +609,12 @@ class Rigs extends React.Component {
                                                                     {rig.notes == '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
-                                                                    <ul>
-                                                                        <li>
-                                                                            <span data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
-                                                                            <ReactToolTip id={`${rig._id}hashrate`} type="info"  >
-                                                                                <ul>
-                                                                                    {rig.singleHashrate.map((hash,j) => (<li key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small></li>))}
-                                                                                </ul>
-                                                                            </ReactToolTip>
-                                                                        </li>
-                                                                        <li>
-                                                                            <span>({rig.singleHashrate.length})</span>
-                                                                        </li>
-                                                                    </ul>
-                                                                    {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
-                                                                        <div>
-                                                                            <label className=''>{(rig.totalHashrate/1).toFixed(2)} MH/s</label>
-                                                                        </div>
-                                                                        <div>
-                                                                            {rig.singleHashrate.map((hash,j) => (<span key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small><br /></span>))}
-                                                                        </div>
-                                                                    </MappleToolTip> */}
+                                                                    <span data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
+                                                                    <ReactToolTip id={`${rig._id}hashrate`} type="info"  >
+                                                                        <ul>
+                                                                            {rig.singleHashrate.map((hash,j) => (<li key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small></li>))}
+                                                                        </ul>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                                 <td>
                                                                     <ul>
@@ -669,22 +641,6 @@ class Rigs extends React.Component {
                                                                             </li>
                                                                         </ul>
                                                                     </ReactToolTip>
-                                                                    {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
-                                                                        <div>
-                                                                            {this.styleMaxTemp(rig.temperatures)}
-                                                                            {Math.max(...rig.fanSpeeds)}&nbsp;%
-                                                                        </div>
-                                                                        <div>
-                                                                            <span>
-                                                                                {rig.temperatures.map((temp,j)=> (<span key={(j+1)*3}>{temp}&nbsp;</span>))}
-                                                                            </span>℃<br/>
-                                                                            <span>
-                                                                                {rig.fanSpeeds.map((speed,j)=> (<span key={(j+1)*10}>{speed}&nbsp;</span>))}
-                                                                            </span>%
-                                                                        </div>
-                                                                    </MappleToolTip> */}
-                                                                    {/* {rig.temperatures.map((temp,j)=> (<label key={(i+j+1)*102}>{temp}C&nbsp;&nbsp;</label>))}<br/>
-                                                                    {rig.fanSpeeds.map((fan,j)=> (<label key={(i+j+1)*201}>{fan}%&nbsp;&nbsp;</label>))}<br/> */}
                                                                 </td>
                                                                 <td>
                                                                     <span data-tip data-for={`${rig._id}uptime`}>
@@ -707,19 +663,6 @@ class Rigs extends React.Component {
                                                                             </li>
                                                                         </ul>
                                                                     </ReactToolTip>
-                                                                    {/* <MappleToolTip float={true} direction={'top'} mappleType={'info'}>
-                                                                        <div>
-                                                                            {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
-                                                                            {rig.isOnline == 0 && '--'}
-                                                                        </div>
-                                                                        <div>
-                                                                            <span>
-                                                                                System Up Time : {moment(rig.serverTime).format('DD/MM/YYYY hh:mm')}<br />
-                                                                                Miner Up Time : {rig.isOnline == 0 && '--'} {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)} <br/>
-                                                                                Last Seen : {this.formatLastSeen2(rig.updatedAt)}<br />
-                                                                            </span>
-                                                                        </div>
-                                                                    </MappleToolTip> */}
                                                                 </td>
                                                                 <td>
                                                                     {/* <i data-toggle="modal" data-id="id value" data-target="#default-Modal" className="fas fa-edit"></i>&nbsp;&nbsp; */}

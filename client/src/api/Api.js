@@ -1,6 +1,6 @@
 //import axios from 'vue-resource';
 
-const  API_URL = 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
+const API_URL =  'http://srv.gnsmining.com:3000/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
 
 class Api {
     

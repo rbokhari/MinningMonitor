@@ -22,6 +22,10 @@ export const RigSchema: Schema = new Schema({
         default: '',
         required: true,
     },
+    wanIp: {
+        type: String,
+        default: ''
+    },
     rigId: {
         type: String,
         default: '',
@@ -31,6 +35,14 @@ export const RigSchema: Schema = new Schema({
         type: String,
         default: '',
         //required: true,
+    },
+    appVersion: {
+        type: String,
+        default: ''
+    },
+    gpuModel: {
+        type: String,
+        default: ''
     },
     kernelName: {
         type: String,
