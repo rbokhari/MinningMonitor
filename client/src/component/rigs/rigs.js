@@ -404,9 +404,9 @@ class Rigs extends React.Component {
         if (typeof temps == undefined) return;
         if (temps == null) return;
         const max = Math.max(...temps);
-        if (max > 85 ) return (<p className="text-danger">{max}&nbsp;℃</p>)
-        else if (max > 75) return (<p className="text-warning">{max}&nbsp;℃</p>)
-        else return (<p>{max}&nbsp;℃</p>)
+        if (max > 85 ) return (<div style={{fontWeight:'bold'}} className="text-danger">{max}&nbsp;℃</div>)
+        else if (max > 75) return (<div style={{fontWeight:'bold'}} className="text-warning">{max}&nbsp;℃</div>)
+        else return (<div>{max}&nbsp;℃</div>)
     }
 
     handleConfirmModalShow(rig, actionId) {
@@ -481,12 +481,70 @@ class Rigs extends React.Component {
                     <div className="main-body">
                         <div className="page-wrapper">
                             <div className="page-body">
-                                <div className="row">
+                            <div className="row">
+                                <div className="col-md-3 col-lg-3">
+                                    <div className="card stat-rev-card">
+                                        <div className="card-block">
+                                            <div className="rev-icon bg-c-red"><i className="fas fa-shopping-cart text-white"></i><span className="ring-sm"></span><span className="ring-lg"></span></div>
+                                            <h2 className="text-c-red">{this.calculateMining()}</h2>
+                                            <p style={{ fontSize: '2em'}} className="text-c-red">Mining Hashrate</p>
+                                        </div>
+                                    </div>
+                                    {/* <div className="card coin-price-card">
+                                        <div className="card-block">
+                                            <div className="row align-items-center">
+                                                <div className="col-auto p-r-0">
+                                                    <div className="coin-icon">
+                                                        <i className="fas fa-cube f-30 text-c-red"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col">
+                                                    <h5 className="text-c-red m-b-5">Mining Hashrate <span class="float-right">{this.calculateMining()}</span></h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                 */}
+                                </div>
+                                <div className="col-md-4 col-lg-4">
+                                    <div className="card coin-price-card">
+                                        <div className="card-block">
+                                            <div className="row align-items-center">
+                                                <div className="col-auto p-r-0">
+                                                    <div className="coin-icon">
+                                                        <i className="fas fa-cube f-30 text-c-green"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col">
+                                                    <h5 className="text-c-green m-b-5">Active GPU <span class="float-right">{this.countActiveGpu()}</span></h5>
+                                                    {/* <p className="m-b-0">Lorem Ipsum is simply dummy</p> */}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                
+                                </div>
+                                <div className="col-md-4 col-lg-4">
+                                    <div className="card coin-price-card">
+                                        <div className="card-block">
+                                            <div className="row align-items-center">
+                                                <div className="col-auto p-r-0">
+                                                    <div className="coin-icon">
+                                                        <i className="fas fa-cube f-30 text-c-blue"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col">
+                                                    <h5 className="text-c-blue m-b-5">Active Miners <span class="float-right">{rigs && rigs.filter(c=>c.isOnline==1).length + ' / ' + rigs.length}</span></h5>
+                                                    {/* <p className="m-b-0">Lorem Ipsum is simply dummy</p> */}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                
+                                </div>
+                            </div>
+                                {/* <div className="row">
                                     <div className="col-xl-3 col-md-6">
                                         <div className="card o-hidden bg-c-blue web-num-card">
                                             <div className="card-block text-white">
                                                 <h5 className="m-t-15">Mining Hashrate</h5>
-                                                {/* <h3 className="m-b-15">{rigs && rigs.reduce((a,b) => (a + parseFloat(b.totalHashrate)), 0).toFixed(0)}&nbsp;MH/s</h3> */}
                                                 <h3 className="m-b-15">{this.calculateMining()}</h3>
                                             </div>
                                         </div>
@@ -518,7 +576,7 @@ class Rigs extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                         
                                 <div className="row">
                                     <div className="col-xl-12 col-md-12">
@@ -605,11 +663,12 @@ class Rigs extends React.Component {
                                                                 </td>
                                                                 <td>{rig.groupName}</td>
                                                                 <td>
-                                                                    {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>}
-                                                                    {rig.notes == '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {/* {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>} */}
+                                                                    {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
-                                                                    <span data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
+                                                                    <span style={{fontWeight:'bold'}} className="text-muted" data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>
                                                                     <ReactToolTip id={`${rig._id}hashrate`} type="info"  >
                                                                         <ul>
                                                                             {rig.singleHashrate.map((hash,j) => (<li key={(j+1)*11}>GPU{j} : &nbsp;{(hash/1000).toFixed(2)}&nbsp;<small>MH/s</small></li>))}
@@ -619,10 +678,10 @@ class Rigs extends React.Component {
                                                                 <td>
                                                                     <ul>
                                                                         <li>
-                                                                            {rig.core && rig.core.map((core,j)=> (<span key={(j+1)*3}>{core}&nbsp;</span>))}
+                                                                            {rig.core && rig.core.map((core,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{core}&nbsp;</small>))}
                                                                         </li>
                                                                         <li>
-                                                                            {rig.memory && rig.memory.map((mem,j)=> (<span key={(j+1)*3}>{mem}&nbsp;</span>))}
+                                                                            {rig.memory && rig.memory.map((mem,j)=> (<small style={{fontSize:'0.9em'}}  key={(j+1)*3}>{mem}&nbsp;</small>))}
                                                                         </li>
                                                                     </ul>
                                                                 </td>
@@ -634,16 +693,16 @@ class Rigs extends React.Component {
                                                                     <ReactToolTip id={`${rig._id}temp`} type="info"  >
                                                                         <ul>
                                                                             <li>
-                                                                                {rig.temperatures.map((temp,j)=> (<span key={(j+1)*3}>{temp}&nbsp;</span>))}
+                                                                                {rig.temperatures.map((temp,j)=> (<span key={(j+1)*3}>{temp}&nbsp;</span>))}&nbsp;℃
                                                                             </li>
                                                                             <li>
-                                                                            {rig.fanSpeeds.map((speed,j)=> (<span key={(j+1)*10}>{speed}&nbsp;</span>))}
+                                                                            {rig.fanSpeeds.map((speed,j)=> (<span key={(j+1)*10}>{speed}&nbsp;</span>))}&nbsp;%
                                                                             </li>
                                                                         </ul>
                                                                     </ReactToolTip>
                                                                 </td>
                                                                 <td>
-                                                                    <span data-tip data-for={`${rig._id}uptime`}>
+                                                                    <span style={{fontWeight: 'bold'}} className="text-muted" data-tip data-for={`${rig._id}uptime`}>
                                                                         {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
                                                                         {rig.isOnline == 0 && '--'}
                                                                     </span>
