@@ -6,6 +6,7 @@ import { Rigs } from './component/rigs';
 import { Groups } from './component/groups';
 import { MinerClient } from './component/minerClient';
 import { WalletList } from './component/wallet';
+import { OptionList } from './component/options';
 
 const Routes = () => (
     <Switch>
@@ -14,7 +15,7 @@ const Routes = () => (
         <Route path="/groups" component={Groups} />
         <Route path="/clients" component={MinerClient} />
         <Route path="/wallet" component={WalletList} />
-        <Route path="/pool" component={()=> <div>Not Implemented Yet</div>} />
+        <Route path="/options" component={OptionList} />
         <Route path="*" component={NotFound} />
     </Switch>
 );

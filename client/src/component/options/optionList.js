@@ -2,19 +2,21 @@ import React from 'react';
 import toastr from 'toastr';
 
 import { IsLoading } from '../common/';
-import WalletAddModal from './walletAddModal';
+import OptionModal from './optionModal';
+
 import Api from '../../api/Api';
 
-class WalletList extends React.Component {
+
+class OptionList extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             isLoading: true,
-            wallets: [],
+            options: [],
             showModa: false,
-            wallet: {}
+            option: {}
         };
 
         this.getData = this.getData.bind(this);
@@ -38,7 +40,7 @@ class WalletList extends React.Component {
             "hideEasing": "linear",
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
-          };
+        };
 
     }
 
@@ -49,17 +51,14 @@ class WalletList extends React.Component {
     getData() {
         //toastr.info('Getting data !');
         this.setState({isLoading: true});
-        Api.get('client')
+        Api.get('profileOption')
             .then(res => res.json())
             .then(data => {
-                this.setState({clients: data.data});
-                Api.get('wallet')
-                    .then(res => res.json())
-                    .then(wallets => {
-                        this.setState({wallets: wallets, isLoading: false});
-                    }, err => {
-                        console.error('error', err);
-                    });
+                this.setState({options: data, isLoading: false});
+            })
+            .catch(err => {
+                console.error('err', err);
+                this.setState({isLoading: false});
             });
     }
 
@@ -73,50 +72,54 @@ class WalletList extends React.Component {
     
     handleModalChange(e) {
         e.preventDefault();
-        let { wallet } = this.state;
-        wallet[e.target.name] = e.target.value;
-        this.setState({ wallet });
+        let { option } = this.state;
+        option[e.target.name] = e.target.value;
+        this.setState({ option });
     }
     
     handleModalSubmit(e) {
         e.preventDefault();
-        const { wallet } = this.state;        
-        if (wallet.id) {
-            Api.put(`wallet/${wallet.id}`, wallet)
+        const { option } = this.state;
+        console.info('option', option);
+        if (option.id) {
+            Api.put(`profileOption/${option.id}`, option)
                 .then(res => {
                     console.info('group post', res);
-                    toastr.success('New Wallet added !', 'Success !');
+                    toastr.success('New Option added !', 'Success !');
                     this.handleModalClose();
                     this.getData();
                 }, err => {
-                    console.error('group error', err);
+                    console.error('option error', err);
                 });
         } else {
-            Api.post('wallet', wallet)
+            Api.post('profileOption', option)
                 .then(res => {
-                    console.info('wallet post', res);
-                    toastr.success('Wallet updated !', 'Success !');
+                    console.info('Option post', res);
+                    toastr.success('Option updated !', 'Success !');
                     this.handleModalClose();
                     this.getData();
                 }, err => {
-                    console.error('group error', err);
+                    console.error('option error', err);
                 });
         }
         //this.setState({showModal: false});
     }
 
+
     render() {
-        const { wallets, isLoading, showModal, wallet } = this.state;
+        const { options, isLoading, showModal, option } = this.state;
 
         return(
             <div className="pcoded-content">
-                <WalletAddModal isOpen={showModal} wallet={wallet} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
+                <OptionModal isOpen={showModal} option={option} 
+                    onHandleChange={this.handleModalChange} 
+                    onHandleSubmit={this.handleModalSubmit} 
+                    onHandleClose={this.handleModalClose} />
                 <div className="page-header">
                     <div className="page-block">
                         <div className="row align-items-center">
                         </div>
                     </div>
-
                 </div>
                 <div className="pcoded-inner-content">
                     <div className="main-body">
@@ -126,7 +129,7 @@ class WalletList extends React.Component {
                                     <div className="col-xl-12 col-md-12">
                                     <div className="card">
                                             <div className="card-header">
-                                                <h5>Wallets</h5>
+                                                <h5>Options</h5>
                                                 <span></span> 
                                                 <div className="card-header-right">
                                                     <button className="btn btn-primary" onClick={(e) => this.handleModalShow(e)}>
@@ -140,32 +143,35 @@ class WalletList extends React.Component {
                                                     <table className="table table-xl">
                                                         <thead>
                                                             <tr>
-                                                                <th className="span4">Name</th>
-                                                                <th className="span4">Address</th>
-                                                                <th className="span3">Notes</th>
-                                                                <th className="span1">Functions</th>
+                                                                <th>Label</th>
+                                                                <th>Core</th>
+                                                                <th>Memory</th>
+                                                                <th>Voltage</th>
+                                                                <th>PowerStage</th>
+                                                                <th>Target Temp</th>
+                                                                <th>Min Fan</th>
+                                                                <th>Functions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {isLoading && <tr><td colSpan="4"><IsLoading /></td></tr>}
-                                                            {!isLoading && wallets.length == 0 && <tr><td colSpan="4">No Record Found</td></tr>}
-                                                            {wallets && wallets.map((wallet, i) => (<tr key={i+1}>
-                                                                <td>{wallet.name}</td>
-                                                                <td>{wallet.ethAddress}</td>
+                                                            {!isLoading && options.length == 0 && <tr><td colSpan="4">No Record Found</td></tr>}
+                                                            {options && options.map((wallet, i) => (<tr key={i+1}>
                                                                 <td>
-                                                                    {wallet.notes}
                                                                 </td>
-
                                                                 <td>
-                                                                    {/* <i className="fas fa-edit" data-tip data-for={`${wallet._id}edit`} onClick={() => this.handleEditModalShow(wallet)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
-                                                                    <ReactToolTip id={`${wallet._id}edit`}>
-                                                                        <span>Update Wallet</span>
-                                                                    </ReactToolTip>
-
-                                                                    <i data-tip data-for={`${wallet._id}delete`}  className="fas fa-trash-alt" tooltip="delete"></i>
-                                                                    <ReactToolTip id={`${wallet._id}delete`} >
-                                                                        <span>Delete Wallet</span>
-                                                                    </ReactToolTip> */}
+                                                                </td>
+                                                                <td>
+                                                                </td>
+                                                                <td>
+                                                                </td>
+                                                                <td>
+                                                                </td>
+                                                                <td>
+                                                                </td>
+                                                                <td>
+                                                                </td>
+                                                                <td>
                                                                 </td>
                                                             </tr>))}
                                                         </tbody>
@@ -183,8 +189,6 @@ class WalletList extends React.Component {
             </div>
         );
     }
-
-
 }
 
-export default WalletList;
+export default OptionList;

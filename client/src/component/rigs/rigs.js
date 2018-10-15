@@ -206,7 +206,6 @@ class Rigs extends React.Component {
                 Api.get('rigs')
                     .then(res => res.json())
                     .then(data =>    {
-                        console.info('data', data);
                         const rigs = data
                             .map(rig => {
                                 return {
@@ -444,6 +443,11 @@ class Rigs extends React.Component {
         this.setState({isConfirmModal: false});
     }
 
+    uniqueValues(arr) {
+        const values = [... new Set(arr)]
+        return values;
+    }
+
     render() {
         const { isLoading, showModal, showDeleteModal, showNoteModal, rigs, rig, groups, sortBy, sortDirection, 
             actionId, actionPosting, actionRigId, isConfirmModal } = this.state;
@@ -482,15 +486,15 @@ class Rigs extends React.Component {
                         <div className="page-wrapper">
                             <div className="page-body">
                             <div className="row">
-                                <div className="col-md-3 col-lg-3">
-                                    <div className="card stat-rev-card">
+                                <div className="col-md-4 col-lg-4">
+                                    {/* <div className="card stat-rev-card">
                                         <div className="card-block">
                                             <div className="rev-icon bg-c-red"><i className="fas fa-shopping-cart text-white"></i><span className="ring-sm"></span><span className="ring-lg"></span></div>
                                             <h2 className="text-c-red">{this.calculateMining()}</h2>
                                             <p style={{ fontSize: '2em'}} className="text-c-red">Mining Hashrate</p>
                                         </div>
-                                    </div>
-                                    {/* <div className="card coin-price-card">
+                                    </div> */}
+                                    <div className="card coin-price-card">
                                         <div className="card-block">
                                             <div className="row align-items-center">
                                                 <div className="col-auto p-r-0">
@@ -499,11 +503,11 @@ class Rigs extends React.Component {
                                                     </div>
                                                 </div>
                                                 <div className="col">
-                                                    <h5 className="text-c-red m-b-5">Mining Hashrate <span class="float-right">{this.calculateMining()}</span></h5>
+                                                    <h5 className="text-c-red m-b-5">Mining Hashrate <span className="float-right">{this.calculateMining()}</span></h5>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                                 */}
+                                    </div>
                                 </div>
                                 <div className="col-md-4 col-lg-4">
                                     <div className="card coin-price-card">
@@ -515,7 +519,7 @@ class Rigs extends React.Component {
                                                     </div>
                                                 </div>
                                                 <div className="col">
-                                                    <h5 className="text-c-green m-b-5">Active GPU <span class="float-right">{this.countActiveGpu()}</span></h5>
+                                                    <h5 className="text-c-green m-b-5">Active GPU <span className="float-right">{this.countActiveGpu()}</span></h5>
                                                     {/* <p className="m-b-0">Lorem Ipsum is simply dummy</p> */}
                                                 </div>
                                             </div>
@@ -532,7 +536,7 @@ class Rigs extends React.Component {
                                                     </div>
                                                 </div>
                                                 <div className="col">
-                                                    <h5 className="text-c-blue m-b-5">Active Miners <span class="float-right">{rigs && rigs.filter(c=>c.isOnline==1).length + ' / ' + rigs.length}</span></h5>
+                                                    <h5 className="text-c-blue m-b-5">Active Miners <span className="float-right">{rigs && rigs.filter(c=>c.isOnline==1).length + ' / ' + rigs.length}</span></h5>
                                                     {/* <p className="m-b-0">Lorem Ipsum is simply dummy</p> */}
                                                 </div>
                                             </div>
@@ -585,8 +589,10 @@ class Rigs extends React.Component {
                                                 <h5>Miners </h5>
                                                 <span>click headers to sort accordingly</span> 
                                                 <div className="card-header-right">
-                                                    <ul className="list-unstyled card-option">
-                                                        <li className="first-opt" ><i onClick={(e) => this.getData(e)} className="fas fa-sync-alt"></i></li>
+                                                    <ul className="list-unstyled">
+                                                        <li className="first-opt">
+                                                            <i onClick={(e) => this.getData(e)} className="fas fa-recycle"></i>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -651,20 +657,14 @@ class Rigs extends React.Component {
                                                                             <li>Miner ID : {rig.rigId}</li>
                                                                             <li>Lan IP : {rig.ip}</li>
                                                                             <li>Public IP : {rig.wanIp}</li>
-                                                                            <li>GPU Model : {rig.gpuModel}</li>
+                                                                            <li>GPU Model : {this.uniqueValues((rig.gpuModel.trim().split(',')))}</li>
                                                                         </ul>
                                                                     </ReactToolTip>
-                                                                    {/* <div> */}
-                                                                    {/* {rig.isNameEdit && 
-                                                                        <form onSubmit={this.handleSubmit}>
-                                                                            <input type="text" value={rig.computerName} onChange={this.handleNameChange} />
-                                                                        </form>
-                                                                    } */}
                                                                 </td>
                                                                 <td>{rig.groupName}</td>
                                                                 <td>
                                                                     {/* {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>} */}
-                                                                    {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}>11</i>}
                                                                     {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
@@ -676,14 +676,29 @@ class Rigs extends React.Component {
                                                                     </ReactToolTip>
                                                                 </td>
                                                                 <td>
-                                                                    <ul>
-                                                                        <li>
-                                                                            {rig.core && rig.core.map((core,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{core}&nbsp;</small>))}
-                                                                        </li>
-                                                                        <li>
-                                                                            {rig.memory && rig.memory.map((mem,j)=> (<small style={{fontSize:'0.9em'}}  key={(j+1)*3}>{mem}&nbsp;</small>))}
-                                                                        </li>
-                                                                    </ul>
+                                                                    <span data-tip data-for={`${rig._id}core`}>
+                                                                        <ul>
+                                                                            <li>
+                                                                                {rig.core && this.uniqueValues(rig.core).map((core,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{core}&nbsp;</small>))}&nbsp;{rig.core && <small>({rig.core.length})</small>}
+                                                                                {/* {rig.core && rig.core.map((core,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{core}&nbsp;</small>))} */}
+                                                                                
+                                                                            </li>
+                                                                            <li>
+                                                                                {/* {rig.memory && rig.memory.map((mem,j)=> (<small style={{fontSize:'0.9em'}}  key={(j+1)*3}>{mem}&nbsp;</small>))} */}
+                                                                                {rig.memory && this.uniqueValues(rig.memory).map((mem,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{mem}&nbsp;</small>))}&nbsp;{rig.memory && <small>({rig.memory.length})</small>}
+                                                                            </li>
+                                                                        </ul>
+                                                                    </span>
+                                                                    <ReactToolTip id={`${rig._id}core`} type="info"  >
+                                                                        <ul>
+                                                                            <li>
+                                                                                {rig.core && rig.core.map((c,j)=> (<span key={(j+1)*3}>{c}&nbsp;</span>))}
+                                                                            </li>
+                                                                            <li>
+                                                                                {rig.memory && rig.memory.map((m,j)=> (<span key={(j+1)*3}>{m}&nbsp;</span>))}
+                                                                            </li>
+                                                                        </ul>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                                 <td>
                                                                     <span data-tip data-for={`${rig._id}temp`}>

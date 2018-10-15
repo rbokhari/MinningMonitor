@@ -22,7 +22,8 @@ OS_VERSION=''
 miner_ip = '127.0.0.1'
 miner_port = 3333
 host_name = socket.gethostname()
-host_ip = socket.gethostbyname(host_name)
+print(host_name)
+#host_ip = socket.gethostbyname(host_name)
 wan_ip = ''
 cards = 0
 gpus = ''

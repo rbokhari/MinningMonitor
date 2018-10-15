@@ -6,7 +6,7 @@ const Menu = () => (
     <nav className="pcoded-navbar">
         <div className="nav-list">
             <div className="pcoded-inner-navbar main-menu">
-            <div className="pcoded-navigation-label" menu-title-theme="theme6">Main Menu</div>
+            {/* <div className="pcoded-navigation-label" menu-title-theme="theme6">Main Menu</div> */}
                 <ul className="pcoded-item pcoded-left-item">
                     {/* <NavItem to="/" onlyActiveOnIndex index={true}>
 						<i className="menu-icon fa fa-tachometer"></i>
@@ -21,6 +21,7 @@ const Menu = () => (
                         </NavLink>
                     </li>
                 </ul>
+            <div className="pcoded-navigation-label" menu-title-theme="theme6">Miners</div>
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
                         <NavLink to="/miners" className="waves-effect waves-dark" activeClassName="active">
@@ -37,6 +38,7 @@ const Menu = () => (
                         </NavLink>
                     </li>
                 </ul>
+                <div className="pcoded-navigation-label" menu-title-theme="theme6">Profile</div>
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
                         <NavLink to="/wallet" className="waves-effect waves-dark">
@@ -45,19 +47,19 @@ const Menu = () => (
                         </NavLink>
                     </li>
                 </ul>
-                {/* <ul className="pcoded-item pcoded-left-item">
-                    <li className="">
-                        <NavLink to="/clients" className="waves-effect waves-dark">
-                            <span className="pcoded-micon"><i className="feather icon-user"></i></span>
-                            <span>Miner Clients</span>
-                        </NavLink>
-                    </li>
-                </ul> */}
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
                         <NavLink to="/pool" className="waves-effect waves-dark">
                             <span className="pcoded-micon"><i className="feather icon-list"></i></span>
-                            <span>Pool Status</span>
+                            <span>Pool</span>
+                        </NavLink>
+                    </li>
+                </ul>
+                <ul className="pcoded-item pcoded-left-item">
+                    <li className="">
+                        <NavLink to="/options" className="waves-effect waves-dark">
+                            <span className="pcoded-micon"><i className="fas fa-cog"></i></span>
+                            <span>Options</span>
                         </NavLink>
                     </li>
                 </ul>
