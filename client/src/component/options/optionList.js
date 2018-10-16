@@ -1,5 +1,6 @@
 import React from 'react';
 import toastr from 'toastr';
+import ReactToolTip from 'react-tooltip';
 
 import { IsLoading } from '../common/';
 import OptionModal from './optionModal';
@@ -54,6 +55,7 @@ class OptionList extends React.Component {
         Api.get('profileOption')
             .then(res => res.json())
             .then(data => {
+                console.info(data);
                 this.setState({options: data, isLoading: false});
             })
             .catch(err => {
@@ -156,22 +158,26 @@ class OptionList extends React.Component {
                                                         <tbody>
                                                             {isLoading && <tr><td colSpan="4"><IsLoading /></td></tr>}
                                                             {!isLoading && options.length == 0 && <tr><td colSpan="4">No Record Found</td></tr>}
-                                                            {options && options.map((wallet, i) => (<tr key={i+1}>
+                                                            {options && options.map((opt, i) => (<tr key={i+1}>
+                                                                <td>{opt.label}</td>
+                                                                <td>{opt.core}</td>
+                                                                <td>{opt.memory}</td>
+                                                                <td>{opt.voltage}</td>
+                                                                <td>{opt.powerStage}</td>
+                                                                <td>{opt.temperature}</td>
+                                                                <td>{opt.fanSpeed}</td>
                                                                 <td>
-                                                                </td>
-                                                                <td>
-                                                                </td>
-                                                                <td>
-                                                                </td>
-                                                                <td>
-                                                                </td>
-                                                                <td>
-                                                                </td>
-                                                                <td>
-                                                                </td>
-                                                                <td>
-                                                                </td>
-                                                                <td>
+                                                                    <i data-tip data-for={`${opt._id}label`} 
+                                                                        style={{cursor: 'pointer'}} 
+                                                                        className="fas fa-edit" ></i>&nbsp;&nbsp;
+                                                                    <ReactToolTip id={`${opt._id}label`}>
+                                                                        <span>Modify Option</span>
+                                                                    </ReactToolTip>
+                                                                    &nbsp;
+                                                                    <i data-tip data-for={`${opt._id}delete`}  className="fas fa-trash-alt" tooltip="delete"></i>
+                                                                    <ReactToolTip id={`${opt._id}delete`} >
+                                                                        <span>Delete Option</span>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                             </tr>))}
                                                         </tbody>

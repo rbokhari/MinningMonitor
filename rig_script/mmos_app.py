@@ -4,7 +4,7 @@ import statistics
 import time
 import requests
 import os
-import asyncio
+#import asyncio
 #import httplib
 
 # from firebase import firebase
@@ -148,6 +148,16 @@ def init():
     memory = stats_memory()
     temps = stats_temp() #  all[::2]
     fans = stats_fan() # all[1::2]
+    temp = 0
+
+    fan = 0
+    miner_uptime = 0,
+    total_shares = 0
+    invalid_shares = 0
+    hashrate = 0
+    hd_serial = ''
+    gpu_model = ''
+
     # hd_serial = stats_os_serial()
     # gpu_model = stats_gpu_model()
 
@@ -204,9 +214,9 @@ def init():
         #rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
         if action_file.is_file():
             action_file = open("mmos_action.txt")
-            action_perform = await action_file.read()
+            action_perform = action_file.read()
             action_file.close()
-            await os.remove("mmos_action.txt")
+            os.remove("mmos_action.txt")
             time.sleep(5)
 
         if isMinerRunning:
@@ -418,9 +428,9 @@ def execute_actions(actions):
             execute_miner_reset()
 
 
-async def execute_reboot():
+def execute_reboot():
     f = open("mmos_action.txt", "w+")
-    await f.write(str(1))
+    f.write(str(1))
     f.close()
     time.sleep(15)
     run_reboot()

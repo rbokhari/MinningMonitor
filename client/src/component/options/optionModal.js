@@ -42,13 +42,28 @@ const OptionModal = ({isOpen, option, onHandleChange, onHandleSubmit, onHandleCl
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Target Temperature:</label>
                         <div className="col-sm-9">
-                            <input type="text" name="targetTemp" className="form-control" value={option && option.targetTemp} onChange={onHandleChange} />
+                            <input name="targetTemp" type="range" list="tickmarks" style={{width: '100%'}} min="1" max="100" step="1" value={option && option.targetTemp} onChange={onHandleChange} />
+                            <datalist id="tickmarks">
+                                <option value="1" label="1" />
+                                <option value="10" />
+                                <option value="20" />
+                                <option value="30" />
+                                <option value="40" />
+                                <option value="50" label="50" />
+                                <option value="60"/>
+                                <option value="70"/>
+                                <option value="80"/>
+                                <option value="90"/>
+                                <option value="100" label="100"/>
+                                </datalist>
+                            {/* <input type="text" name="targetTemp" className="form-control" value={option && option.targetTemp} onChange={onHandleChange} /> */}
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Min Fan Speed:</label>
                         <div className="col-sm-9">
-                            <input type="text" name="minFanSpeed" className="form-control" value={option && option.minFanSpeed} onChange={onHandleChange} />
+                            <input name="minFanSpeed" type="range" list="tickmarks" style={{width: '100%'}} min="1" max="100" step="1" value={option && option.minFanSpeed} onChange={onHandleChange} />
+                            {/* <input type="text" name="minFanSpeed" className="form-control" value={option && option.minFanSpeed} onChange={onHandleChange} /> */}
                         </div>
                     </div>
                     <div className="form-group row">

@@ -63,14 +63,6 @@ const Menu = () => (
                         </NavLink>
                     </li>
                 </ul>
-                <ul className="pcoded-item pcoded-left-item">
-                    <li className="">
-                        <NavLink to="/crypto" className="waves-effect waves-dark">
-                            <span className="pcoded-micon"><i className="feather icon-info"></i></span>
-                            <span>Crypto Market</span>
-                        </NavLink>
-                    </li>
-                </ul>
             </div>
         </div>
     </nav>

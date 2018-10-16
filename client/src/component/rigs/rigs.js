@@ -664,7 +664,7 @@ class Rigs extends React.Component {
                                                                 <td>{rig.groupName}</td>
                                                                 <td>
                                                                     {/* {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>} */}
-                                                                    {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}>11</i>}
+                                                                    {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                     {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
                                                                 </td>
                                                                 <td>
@@ -679,13 +679,13 @@ class Rigs extends React.Component {
                                                                     <span data-tip data-for={`${rig._id}core`}>
                                                                         <ul>
                                                                             <li>
-                                                                                {rig.core && this.uniqueValues(rig.core).map((core,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{core}&nbsp;</small>))}&nbsp;{rig.core && <small>({rig.core.length})</small>}
+                                                                                {rig.core && this.uniqueValues(rig.core).map((core,j)=> (<span key={(j+1)*3}>{core}&nbsp;</span>))}
                                                                                 {/* {rig.core && rig.core.map((core,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{core}&nbsp;</small>))} */}
                                                                                 
                                                                             </li>
                                                                             <li>
                                                                                 {/* {rig.memory && rig.memory.map((mem,j)=> (<small style={{fontSize:'0.9em'}}  key={(j+1)*3}>{mem}&nbsp;</small>))} */}
-                                                                                {rig.memory && this.uniqueValues(rig.memory).map((mem,j)=> (<small style={{fontSize:'0.9em'}} key={(j+1)*3}>{mem}&nbsp;</small>))}&nbsp;{rig.memory && <small>({rig.memory.length})</small>}
+                                                                                {rig.memory && this.uniqueValues(rig.memory).map((mem,j)=> (<span key={(j+1)*3}>{mem}&nbsp;</span>))}
                                                                             </li>
                                                                         </ul>
                                                                     </span>
