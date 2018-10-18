@@ -148,9 +148,7 @@ def init():
     memory = stats_memory()
     temps = stats_temp() #  all[::2]
     fans = stats_fan() # all[1::2]
-    temp = 0
 
-    fan = 0
     miner_uptime = 0,
     total_shares = 0
     invalid_shares = 0
@@ -271,19 +269,19 @@ def init():
         #condition = False
 
 # online registering
-def register_rig():
-    #{'fans': [1, 2, 3], 'computer': 'comp', 'invalid': 777, 'totalHash': 12300, 'single': 123, 'kernel': 'kernel11', 'status': 1, 'ip': '192.168.1.1', 'temps': [2, 3, 54], 'osName': 'windows', 'shares': 1111}
-    rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate }
-    print('-------------rig-------------')
-    print(rig)
-    response = requests.post(uri, json=rig)
-    if response.status_code != requests.codes.created: # 201:
-        print('error occured', response.status_code)
-        #raise ApiError('POST /tasks/ {}'.format(result.status_code))
-    print('Created Rig. ID: {}'.format(response.json()))
-    #result = firebase.post('rigs', { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate })
-    print(response)
-    return response
+# def register_rig():
+#     #{'fans': [1, 2, 3], 'computer': 'comp', 'invalid': 777, 'totalHash': 12300, 'single': 123, 'kernel': 'kernel11', 'status': 1, 'ip': '192.168.1.1', 'temps': [2, 3, 54], 'osName': 'windows', 'shares': 1111}
+#     rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate }
+#     print('-------------rig-------------')
+#     print(rig)
+#     response = requests.post(uri, json=rig)
+#     if response.status_code != requests.codes.created: # 201:
+#         print('error occured', response.status_code)
+#         #raise ApiError('POST /tasks/ {}'.format(result.status_code))
+#     print('Created Rig. ID: {}'.format(response.json()))
+#     #result = firebase.post('rigs', { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate })
+#     print(response)
+#     return response
 
 #def ping_from_rig(id):
     #result = firebase.put('rigs', id, { 'email': 'py_update@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now() })

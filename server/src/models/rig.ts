@@ -51,8 +51,8 @@ export const RigSchema: Schema = new Schema({
     },
     computerName: {
         type: String,
-        default: '',
-        //required: true,
+        default: 'A_New_Miner',
+        required: true,
     },
     totalHashrate: {
         type: String,

@@ -383,7 +383,7 @@ class Rigs extends React.Component {
 
     calculateMining() {
         const { rigs } = this.state;
-        let total = rigs.reduce((a,b) => (a + parseFloat(b.totalHashrate)), 0);
+        let total = rigs.reduce((a,b) => (a + parseFloat(b.totalHashrate ? b.totalHashrate : 0)), 0);
         if (total > 1024) {
             total = (total/1024).toFixed(2) + ' GH/s';
         } else {

@@ -62,60 +62,102 @@ export class RigRouter {
         //     return;
         // }
 
-        const cards: Number = req.body.cards;
+        // const cards: Number = req.body.cards;
         const osName: string = req.body.osName;
         const email: string = req.body.email;
         const ip: string = req.body.ip;
         const kernelName: string = req.body.kernel;
-        const computerName: string = req.body.worker;
-        const totalHashrate: string = req.body.totalHashrate;
-        const shares: string = req.body.t_shares;
-        const invalidShares: string = req.body.i_shares;
-        const singleHashrate = req.body.gpu;
-        const serverTime = req.body.serverTime;
-        const core = req.body.cores;
-        const memory = req.body.memory;
+        // const computerName: string = req.body.worker;
+        // const totalHashrate: string = req.body.totalHashrate;
+        // const shares: string = req.body.t_shares;
+        // const invalidShares: string = req.body.i_shares;
+        // const singleHashrate = req.body.gpu;
+        const updatedAt = new Date(); // req.body.updatedAt;
+        // const core = req.body.cores;
+        // const memory = req.body.memory;
         const wanIp = req.body.wanIp || '';
-        const gpuModel = req.body.gpuModel || '';
+        // const gpuModel = req.body.gpuModel || '';
         const appVersion = req.body.appVersion || '';
         const rigId = req.body.rigId || '';
 
+        // const temperatures = req.body.temps.map(t=> t);
+        // const fanSpeeds = req.body.fans.map(f => f);
 
-        const temperatures = req.body.temps.map(t=> t);
-        const fanSpeeds = req.body.fans.map(f => f);
-
-        const rig = new Rig({
-            cards,
+        const rig = {
+//            cards,
             osName,
             ip,
-            kernelName,
-            computerName,
-            totalHashrate,
-            singleHashrate,
-            shares,
-            invalidShares,
+            // kernelName,
+            // computerName,
+            // totalHashrate,
+            // singleHashrate,
+            // shares,
+            // invalidShares,
             status: 1,
-            temperatures,
-            fanSpeeds,
+            // temperatures,
+            // fanSpeeds,
             email,
-            serverTime,
-            core,
-            memory,
+            updatedAt,
+            // core,
+            // memory,
             wanIp,
-            gpuModel,
-            appVersion,
             rigId
-        });
+            // gpuModel,
+            // appVersion,
+            // rigId
+        };
 
-        rig.save()
+        Rig.findOneAndUpdate({rigId: rigId}, rig, {upsert: true, new: true, setDefaultsOnInsert: true})
             .then(data => {
-                res.status(201).json({data});
+                res.status(201).json(data);
             })
             .catch(err => {
-                console.log('error occured by creating rig', err);
-                res.status(500).json({ err });
-            });
+                console.error('error rig', err);
+            })
+
+        // rig.save()
+        //     .then(data => {
+        //         res.status(201).json({data});
+        //     })
+        //     .catch(err => {
+        //         console.log('error occured by creating rig', err);
+        //         res.status(500).json({ err });
+        //     });
     }
+
+    // public PingRigOnly(req: Request, res: Response): void {
+
+    //     const osName: string = req.body.osName;
+    //     const email: string = req.body.email;
+    //     const ip: string = req.body.ip;
+    //     const kernelName: string = req.body.kernel;
+    //     const computerName: string = req.body.worker;
+    //     const serverTime = req.body.serverTime;
+    //     const appVersion = req.body.appVersion || '';
+    //     const rigId = req.body.rigId || '';
+
+
+    //     const rig = {
+    //         osName,
+    //         ip,
+    //         kernelName,
+    //         computerName,
+    //         status: 1,
+    //         email,
+    //         serverTime,
+    //         appVersion,
+    //         rigId
+    //     };
+
+    //     Rig.findByIdAndUpdate({rigId: rigId}, {$set: rig}, {new: true})
+    //         .then(data => {
+    //             res.status(201).json({data});
+    //         })
+    //         .catch(err => {
+    //             console.log('error occured by creating rig', err);
+    //             res.status(500).json({ err });
+    //         });
+    // }
 
     public UpdateRig(req: Request, res: Response): void {
         const id: string = req.params.id;
