@@ -5,6 +5,7 @@ import MinerClientRouter from './MinerClientRouter';
 import MinerGroupRouter from './MinerGroupRouter';
 import WalletRouter from './WalletRouter';
 import ProfileOptionRouter from './ProfileOptionRouter';
+import PoolRouter from './PoolRouter';
 
 export {
     RigRouter,
@@ -12,5 +13,6 @@ export {
     MinerClientRouter,
     MinerGroupRouter,
     WalletRouter,
-    ProfileOptionRouter
+    ProfileOptionRouter,
+    PoolRouter
 }

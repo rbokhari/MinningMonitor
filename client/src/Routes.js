@@ -7,6 +7,7 @@ import { Groups } from './component/groups';
 import { MinerClient } from './component/minerClient';
 import { WalletList } from './component/wallet';
 import { OptionList } from './component/options';
+import { PoolList } from './component/pool';
 
 const Routes = () => (
     <Switch>
@@ -16,6 +17,7 @@ const Routes = () => (
         <Route path="/clients" component={MinerClient} />
         <Route path="/wallet" component={WalletList} />
         <Route path="/options" component={OptionList} />
+        <Route path="/pool" component={PoolList} />
         <Route path="*" component={NotFound} />
     </Switch>
 );

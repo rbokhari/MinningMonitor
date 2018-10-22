@@ -7,7 +7,7 @@ import * as helmet from 'helmet';
 import * as cors from 'cors';
 
 import config from './config';
-import { RigRouter, ActionRouter, MinerGroupRouter, MinerClientRouter, WalletRouter, ProfileOptionRouter } from './router';
+import { RigRouter, ActionRouter, MinerGroupRouter, MinerClientRouter, WalletRouter, ProfileOptionRouter, PoolRouter } from './router';
 
 class Server {
 
@@ -58,6 +58,7 @@ class Server {
         this.app.use('/api/v1/group', MinerGroupRouter);
         this.app.use('/api/v1/wallet', WalletRouter);
         this.app.use('/api/v1/profileoption', ProfileOptionRouter);
+        this.app.use('/api/v1/pool', PoolRouter);
     }
 }
 

@@ -11,6 +11,7 @@ export class WalletRouter {
 
     public GetAll(req: Request, res: Response): void {
         Wallet.find()
+            
             .then(data => {
                 res.status(200).json(data);
             })

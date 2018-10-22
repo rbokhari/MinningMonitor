@@ -125,40 +125,6 @@ export class RigRouter {
         //     });
     }
 
-    // public PingRigOnly(req: Request, res: Response): void {
-
-    //     const osName: string = req.body.osName;
-    //     const email: string = req.body.email;
-    //     const ip: string = req.body.ip;
-    //     const kernelName: string = req.body.kernel;
-    //     const computerName: string = req.body.worker;
-    //     const serverTime = req.body.serverTime;
-    //     const appVersion = req.body.appVersion || '';
-    //     const rigId = req.body.rigId || '';
-
-
-    //     const rig = {
-    //         osName,
-    //         ip,
-    //         kernelName,
-    //         computerName,
-    //         status: 1,
-    //         email,
-    //         serverTime,
-    //         appVersion,
-    //         rigId
-    //     };
-
-    //     Rig.findByIdAndUpdate({rigId: rigId}, {$set: rig}, {new: true})
-    //         .then(data => {
-    //             res.status(201).json({data});
-    //         })
-    //         .catch(err => {
-    //             console.log('error occured by creating rig', err);
-    //             res.status(500).json({ err });
-    //         });
-    // }
-
     public UpdateRig(req: Request, res: Response): void {
         const id: string = req.params.id;
         const cards: Number = req.body.cards;
