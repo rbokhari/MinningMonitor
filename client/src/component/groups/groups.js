@@ -24,6 +24,9 @@ class Groups extends React.Component {
                 notes: ''
             },
             groups: [],
+            wallets: [],
+            pools: [],
+            clocktones: [],
             clients: [],
             miners: []
         };
@@ -43,6 +46,9 @@ class Groups extends React.Component {
 
     componentDidMount() {
         this.getData();
+        this.getWallet();
+        this.getPools();
+        this.getClocktones()
     }
 
     getData() {
@@ -60,6 +66,39 @@ class Groups extends React.Component {
                     }, err => {
                         console.error('error', err);
                     });
+            });
+    }
+
+    getWallet() {
+        Api.get('wallet')
+            .then(res => res.json())
+            .then(wallets => {
+                this.setState({wallets: wallets});
+            }, err => {
+                console.error('error', err);
+            });
+    }
+
+    getPools() {
+        Api.get('pool')
+            .then(res => res.json())
+            .then(pools => {
+                console.info('group pools', pools);
+                this.setState({pools: pools});
+            }, err => {
+                console.error('error', err);
+            });
+    }
+
+
+    getClocktones() {
+        Api.get('profileoption')
+            .then(res => res.json())
+            .then(clocktones => {
+                console.info('clocktones data', clocktones);
+                this.setState({clocktones: clocktones});
+            }, err => {
+                console.error('error', err);
             });
     }
 
@@ -157,11 +196,11 @@ class Groups extends React.Component {
 
 
     render() {
-        const { showModal, group, clients, groups, showDeleteModal, miners, isLoading } = this.state;
+        const { showModal, group, clients, groups, showDeleteModal, miners, wallets, pools, clocktones, isLoading } = this.state;
         return (
             <div className="pcoded-content">
                 <GroupDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
-                <MinerGroupModal isOpen={showModal} group={group} clients={clients} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
+                <MinerGroupModal isOpen={showModal} group={group} wallets={wallets} pools={pools} clocktones={clocktones} clients={clients} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
                 <div className="page-header">
                     <div className="page-block">
                         <div className="row align-items-center">

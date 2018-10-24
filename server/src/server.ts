@@ -62,4 +62,4 @@ class Server {
     }
 }
 
-export default new Server().app;
+export default new Server().app; 

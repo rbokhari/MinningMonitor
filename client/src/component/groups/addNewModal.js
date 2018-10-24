@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const MinerGroupModal = ({isOpen, group, clients, onHandleChange, onHandleSubmit, onHandleClose}) => {
+const MinerGroupModal = ({isOpen, group, clients, wallets, pools, clocktones, onHandleChange, onHandleSubmit, onHandleClose}) => {
     
     if (!isOpen) return (null);
     return (
         <Modal isOpen={isOpen}>
             <form onSubmit={onHandleSubmit}>
-                <ModalHeader>{group ? 'Edit Group' : 'Add New Group'}</ModalHeader>
+                <ModalHeader>{group ? 'New Group' : 'Edit Group'}</ModalHeader>
                 <ModalBody>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Name:</label>
@@ -25,15 +25,43 @@ const MinerGroupModal = ({isOpen, group, clients, onHandleChange, onHandleSubmit
                         </div>
                     </div>
                     <div className="form-group row">
+                        <label className="col-sm-3 col-form-label">Wallet:</label>
+                        <div className="col-sm-9">
+                            <select name="wallet" className="form-control" value={group && group.wallet} onChange={onHandleChange}>
+                                <option></option>
+                                {wallets && wallets.map((w, i) => (<option key={i} value={w._id}>{w.name}</option>))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-3 col-form-label">Pool:</label>
+                        <div className="col-sm-9">
+                            <select name="pool" className="form-control" value={group && group.pool} onChange={onHandleChange}>
+                                <option></option>
+                                {pools && pools.map((pool, i) => (<option key={i} value={pool._id}>{pool.name}</option>))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-3 col-form-label">Clocktone:</label>
+                        <div className="col-sm-9">
+                            <select name="clocktone" className="form-control" value={group && group.clocktone} onChange={onHandleChange}>
+                                <option></option>
+                                {clocktones && clocktones.map((c, i) => (<option key={i} value={c._id}>{c.label}</option>))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Configuration:</label>
                         <div className="col-sm-9">
-                            <textarea name="config" className="form-control" rows="5" value={group && group.config}  onChange={onHandleChange}></textarea>
+                            <textarea name="config" className="form-control" rows="3" value={group && group.config}  onChange={onHandleChange}></textarea>
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Remarks:</label>
                         <div className="col-sm-9">
-                            <textarea name="notes" className="form-control" rows="5"  value={group && group.notes} onChange={onHandleChange}></textarea>
+                            <textarea name="notes" className="form-control" rows="2"  value={group && group.notes} onChange={onHandleChange}></textarea>
                         </div>
                     </div>
                 </ModalBody>

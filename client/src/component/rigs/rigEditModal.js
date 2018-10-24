@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const RigEditModal = ({isOpen, rig, groups, onHandleChange, onHandleSubmit, onHandleClose}) => {
+const RigEditModal = ({isOpen, rig, groups, clocktones, onHandleChange, onHandleSubmit, onHandleClose}) => {
     if (!isOpen) return (null);
     return (
         <Modal isOpen={isOpen}>
@@ -20,6 +20,15 @@ const RigEditModal = ({isOpen, rig, groups, onHandleChange, onHandleSubmit, onHa
                             <select className="form-control" name="group" onChange={onHandleChange}>
                                 <option></option>
                                 {groups && groups.map((gp,i) => (<option key={i} value={gp.group._id} selected={gp.group._id==rig.group}>{gp.group.name}</option>))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-3 col-form-label">Clocktone:</label>
+                        <div className="col-sm-9">
+                            <select className="form-control" name="clocktone" onChange={onHandleChange}>
+                                <option></option>
+                                {clocktones && clocktones.map((ck,i) => (<option key={i} value={ck._id} selected={ck==rig.ck}>{ck.label}</option>))}
                             </select>
                         </div>
                     </div>

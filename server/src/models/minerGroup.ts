@@ -19,6 +19,18 @@ export const MinerGroupSchema: Schema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: 'MinerClient'
     },
+    wallet: {
+        type: Schema.Types.ObjectId, 
+        ref: 'Wallet'
+    },
+    pool: {
+        type: Schema.Types.ObjectId, 
+        ref: 'Pool'
+    },
+    clocktone: {
+        type: Schema.Types.ObjectId, 
+        ref: 'ProfileOption'
+    },
     configuration: {
         type: String
     },

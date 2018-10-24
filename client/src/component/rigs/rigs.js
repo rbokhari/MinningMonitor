@@ -30,6 +30,7 @@ class Rigs extends React.Component {
             idEdit: '',
             rigs: [],
             groups: [],
+            clocktones: [],
             rig: {},
             showModal: false,
             showDeleteModal: false,
@@ -178,7 +179,11 @@ class Rigs extends React.Component {
         Api.get('group')
             .then(res => res.json())
             .then(data => {
-                this.setState((prevState, props) => ({groups: data, showModal: true, rig: rigClone}));
+                Api.get('profileOption')
+                    .then(opt => opt.json())
+                    .then(options => {
+                        this.setState((prevState, props) => ({groups: data, clocktones: options, showModal: true, rig: rigClone}));
+                    })
             })
     }
 
@@ -450,7 +455,7 @@ class Rigs extends React.Component {
 
     render() {
         const { isLoading, showModal, showDeleteModal, showNoteModal, rigs, rig, groups, sortBy, sortDirection, 
-            actionId, actionPosting, actionRigId, isConfirmModal } = this.state;
+            actionId, actionPosting, actionRigId, isConfirmModal, clocktones } = this.state;
         
         var msg = '';
         if (actionId==1) msg = `Are you sure to restart miner machine : ${rig.computerName} ?`;
@@ -459,7 +464,7 @@ class Rigs extends React.Component {
         return (<div>
             <div className="pcoded-content">
                 <ConfirmDialog isOpen={isConfirmModal} title={`Miner : ${rig.computerName}`} message={msg} onHandleSubmit={this.handleConfirmSubmit} onHandleClose={this.handleConfirmClose} />
-                <RigEditModal isOpen={showModal} rig={rig} groups={groups} onHandleClose={this.handleModalClose} onHandleChange={this.handleChange} onHandleSubmit={this.handleSubmit}  />
+                <RigEditModal isOpen={showModal} rig={rig} groups={groups} clocktones={clocktones} onHandleClose={this.handleModalClose} onHandleChange={this.handleChange} onHandleSubmit={this.handleSubmit}  />
                 <RigDeleteModal isOpen={showDeleteModal} onHandleClose={this.handleDeleteClose} onHandleSubmit={this.handleDeleteSubmit} />
                 <RigNoteModal isOpen={showNoteModal} rig={rig} onHandleClose={this.handleNoteClose} onHandleSubmit={this.handleNoteSubmit} onHandleChange={this.handleNoteChange} />
                 <div className="page-header">
