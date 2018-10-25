@@ -13,7 +13,7 @@ from pathlib import Path
 import platform
 
 #uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
-uri = "http://srv.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+uri = "http://srv.gnsmining.com:3005/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
 APP_VERSION= '1.0.3'
 OS_VERSION=''
@@ -217,10 +217,15 @@ def init():
             os.remove("mmos_action.txt")
             time.sleep(5)
 
+        # if isMinerRunning:
+        #     rig = { 'wanIp': wan_ip, 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'appVersion': APP_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+        # else:
+        #     rig = { 'wanIp': wan_ip, 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'appVersion': APP_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
+
         if isMinerRunning:
-            rig = { 'wanIp': wan_ip, 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': miner_uptime, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'appVersion': APP_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': cards, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
+            rig = { 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': miner_uptime, 'appVersion': APP_VERSION, 'cards': cards, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
         else:
-            rig = { 'wanIp': wan_ip, 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'appVersion': APP_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
+            rig = { 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': 0, 'appVersion': APP_VERSION, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
         
         try:
             print(uri)
@@ -242,7 +247,8 @@ def init():
 
             group = result['rigReturn']['group']
             if (len(group)):
-                configuration = str(group['configuration']).replace('$MinerName', comp_name)
+                # configuration = str(group['configuration']).replace('$MinerName', comp_name) 
+                configuration = str(group).replace('$MinerName', comp_name) 
                 save_group_config_to_file(configuration)
                 
         except requests.exceptions.ConnectionError as e:

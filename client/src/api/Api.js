@@ -1,6 +1,6 @@
 //import axios from 'vue-resource';
 
-const API_URL =  'http://srv.gnsmining.com:3000/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
+const API_URL =  'http://srv.gnsmining.com:3005/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
 
 class Api {
     
@@ -37,8 +37,7 @@ class Api {
             'authorization': localStorage.getItem('token'),
             'CompanyId': localStorage.getItem('companyId'),
         };
-        console.info(`${API_URL}${url}`, data);
-        const params = Object.assign( {}, data );
+        //const params = Object.assign( {}, data );
         return fetch(`${API_URL}${url}`, {
             method: 'put',
             headers: headers,

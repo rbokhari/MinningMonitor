@@ -48,7 +48,7 @@ class Groups extends React.Component {
         this.getData();
         this.getWallet();
         this.getPools();
-        this.getClocktones()
+        this.getClocktones();
     }
 
     getData() {
@@ -131,7 +131,7 @@ class Groups extends React.Component {
         if (group.id) {
             Api.put(`group/${group.id}`, group)
                 .then(res => {
-                    console.info('group post', res);
+                    console.info('group put', res);
                     this.handleModalClose();
                     this.getData();
                 }, err => {

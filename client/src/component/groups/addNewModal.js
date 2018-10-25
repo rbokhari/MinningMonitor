@@ -38,7 +38,7 @@ const MinerGroupModal = ({isOpen, group, clients, wallets, pools, clocktones, on
                         <div className="col-sm-9">
                             <select name="pool" className="form-control" value={group && group.pool} onChange={onHandleChange}>
                                 <option></option>
-                                {pools && pools.map((pool, i) => (<option key={i} value={pool._id}>{pool.name}</option>))}
+                                {pools && pools.map((pool, i) => (<option key={i} value={pool.id}>{pool.name}</option>))}
                             </select>
                         </div>
                     </div>

@@ -44,12 +44,17 @@ export class MinerGroupRouter {
     public GetSingle(req: Request, res: Response): void {
         const id: string = req.params.id;
         MinerGroup.findOne({_id: id})
-            .then(data => {
+            .populate('minerClient', 'name')
+            .populate('pool', 'name poolAddress -_id')
+            .populate('clocktone')
+            .populate('wallet', 'name ethAddress -_id')
+            .exec((err, data) => {
+                if (err) res.status(500).json(err);;
                 res.status(200).json(data);
-            })
-            .catch(err => {
-                res.status(500).json(err);
             });
+            // .catch(err => {
+            //     res.status(500).json(err);
+            // });
     }
 
     public Create(req: Request, res: Response): void {
@@ -62,14 +67,21 @@ export class MinerGroupRouter {
         const name: Number = req.body.name;
         const minerClient = req.body.client;
         const notes: String = req.body.notes;
-        const configuration: String = req.body.config;
+        //const configuration: String = req.body.config;
         const status = 1;
+        const wallet: string = req.body.wallet;
+        const pool: string = req.body.pool;
+        const clocktone: string = req.body.clocktone;
+
 
         const group = new MinerGroup({
             name,
             notes,
             minerClient,
-            configuration,
+            //configuration,
+            wallet,
+            pool,
+            clocktone,
             status
         });
 
@@ -88,6 +100,11 @@ export class MinerGroupRouter {
         const name: Number = req.body.name;
         const notes: Number = req.body.notes;
         const minerClient: string = req.body.client;
+        
+        const wallet: string = req.body.wallet;
+        const pool: string = req.body.pool;
+        const clocktone: string = req.body.clocktone;
+
         const configuration: string = req.body.config;
         const status: string = req.body.status;
 
@@ -95,11 +112,19 @@ export class MinerGroupRouter {
             name,
             notes,
             minerClient,
-            configuration,
+            //configuration,
+            wallet,
+            pool,
+            clocktone,
             status
         };
+
         MinerGroup.findByIdAndUpdate( id, {$set: group}, {new: true}, function(err, updateGroup) {
-            if (err) res.status(400).json(err);            
+            if (err) {
+                console.info('err', err);
+                res.status(400).json(err);
+            } 
+            console.info('no error >>>>>>');
             res.status(200).json({
                 updateGroup
             });

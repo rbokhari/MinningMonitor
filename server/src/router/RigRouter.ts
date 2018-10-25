@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import Rig from '../models/rig';
 import Action from '../models/action';
 import MinerGroup from '../models/minerGroup';
+
 import { parse } from 'querystring';
 
 export class RigRouter {
@@ -195,14 +196,35 @@ export class RigRouter {
                     };
 
                     if (updRig['group']) {
-                        MinerGroup.findById(updRig['group'])
-                            .then(gp => {
-                                rigReturn.group = gp;
+                        MinerGroup.findOne({_id: updRig['group']})
+                            .populate('minerClient', 'name')
+                            .populate('pool', 'name poolAddress -_id')
+                            .populate('clocktone')
+                            .populate('wallet', 'name ethAddress -_id')
+                            .exec((err, gp) => {
+                                if (err) console.error('miner group error', err);
+
+                                console.log('group detail', gp);
+                                let config = '{"status":"ok","minerPath":"\/root\/miner\/$MinerClient\/ethdcrminer64","minerOptions":"-epool $MinerPool -ewal $MinerWallet.$MinerName -epsw x","ocCore": $MinerCore, "ocMemory":$MinerMemory, "ocPowerlimit":$MinerPowerStage, "ocTempTarget":$MinerTemperature, "ocFanSpeedMin": $MinerFanSpeed, "srrEnabled":"","srrSerial":"","srrSlot":"","ocVddc":$MinerVoltage,"ocMode":"0","ebSerial":"","LABSOhGodAnETHlargementPill":"off"}';
+                                config = config.replace('$MinerClient', gp['minerClient']['name']);
+                                config = config.replace('$MinerPool', gp['pool']['poolAddress']);
+                                config = config.replace('$MinerWallet', gp['wallet']['ethAddress']);
+
+                                if (gp['clocktone']) {
+                                    config = config.replace('$MinerCore', gp['clocktone']['core']);
+                                    config = config.replace('$MinerMemory', gp['clocktone']['memory']);
+                                    config = config.replace('$MinerPowerStage', gp['clocktone']['powerStage']);
+                                    config = config.replace('$MinerTemperature', gp['clocktone']['temperature']);
+                                    config = config.replace('$MinerFanSpeed', gp['clocktone']['fanSpeed']);
+                                    config = config.replace('$MinerVoltage', gp['clocktone']['voltage']);
+                                }
+                                //config = config.replace('$MinerPool', )
+                                rigReturn.group = config;
+
                                 res.status(200).json({
                                     rigReturn
                                 });
-                            })
-                            .catch(err => res.status(400).json(err));
+                            });
                     } else {
                         res.status(200).json({
                             rigReturn

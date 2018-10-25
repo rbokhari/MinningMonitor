@@ -12,6 +12,9 @@ export const MinerClinetSchema: Schema = new Schema({
     name: {
         type: String
     },
+    execFile: {
+        type: String
+    },
     isR: {
         type: Number
     },
