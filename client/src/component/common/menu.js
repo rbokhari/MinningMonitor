@@ -38,6 +38,14 @@ const Menu = () => (
                         </NavLink>
                     </li>
                 </ul>
+                <ul className="pcoded-item pcoded-left-item">
+                    <li className="">
+                        <NavLink to="/clients" className="waves-effect waves-dark">
+                            <span className="pcoded-micon"><i className="feather icon-user"></i></span>
+                            <span>Miner Client</span>
+                        </NavLink>
+                    </li>
+                </ul>
                 <div className="pcoded-navigation-label" menu-title-theme="theme6">Profile</div>
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">

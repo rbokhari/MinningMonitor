@@ -16,6 +16,12 @@ const MinerClientModal = ({isOpen, client, onHandleChange, onHandleSubmit, onHan
                         </div>
                     </div>
                     <div className="form-group row">
+                        <label className="col-sm-3 col-form-label">Executable:</label>
+                        <div className="col-sm-9">
+                            <input type="text" name="exec" className="form-control" onChange={onHandleChange} />
+                        </div>
+                    </div>
+                    <div className="form-group row">
                         <label className="col-sm-3 col-form-label">R:</label>
                         <div className="col-sm-9">
                             <input type="checkbox" name="r" className="" onChange={onHandleChange} />

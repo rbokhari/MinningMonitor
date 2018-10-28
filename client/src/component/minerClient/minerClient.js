@@ -126,6 +126,7 @@ class MinerClient extends React.Component {
                                                             <tr>
                                                                 <th style={{width:'10pt'}}></th>
                                                                 <th>Client Name</th>
+                                                                <th>Executable</th>
                                                                 <th>R</th>
                                                                 <th>RX</th>
                                                                 <th>NV</th>
@@ -137,6 +138,7 @@ class MinerClient extends React.Component {
                                                             {clients && clients.map((client, i) => (<tr key={i}>
                                                                 <td>{i+1}</td>
                                                                 <td>{client.name}</td>
+                                                                <td>{client.execFile}</td>
                                                                 <td>{client.isR}</td>
                                                                 <td>{client.isRx}</td>
                                                                 <td>{client.isNv}</td>

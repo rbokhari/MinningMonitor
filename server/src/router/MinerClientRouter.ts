@@ -44,6 +44,7 @@ export class MinerClientRouter {
         // }
 
         const name: Number = req.body.name;
+        const execFile: Number = req.body.exec;
         const isR: string = req.body.r;
         const isRx: string = req.body.rx;
         const isNv: string = req.body.nv;
@@ -53,6 +54,7 @@ export class MinerClientRouter {
 
         const client = new MinerClient({
             name,
+            execFile,
             isR,
             isRx,
             isNv,
@@ -73,6 +75,7 @@ export class MinerClientRouter {
     public Update(req: Request, res: Response): void {
         const id: string = req.params.id;
         const name: Number = req.body.name;
+        const execFile: Number = req.body.exec;
         const isR: string = req.body.r;
         const isRx: string = req.body.rx;
         const isNv: string = req.body.nv;
@@ -81,6 +84,7 @@ export class MinerClientRouter {
 
         const client = {
             name,
+            execFile,
             isR,
             isRx,
             isNv,
