@@ -1,5 +1,6 @@
 import React from 'react';
 import toastr from 'toastr';
+import ReactToolTip from 'react-tooltip';
 
 import { IsLoading } from '../common/';
 import PoolAddModal from './poolAddModal';
@@ -13,7 +14,7 @@ class PoolList extends React.Component {
         this.state = {
             isLoading: true,
             pools: [],
-            showModa: false,
+            showModal: false,
             pool: {}
         };
 
@@ -38,8 +39,7 @@ class PoolList extends React.Component {
             "hideEasing": "linear",
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
-          };
-
+        };
     }
 
     componentDidMount() {
@@ -47,14 +47,24 @@ class PoolList extends React.Component {
     }
 
     getData() {
-        //toastr.info('Getting data !');
         this.setState({isLoading: true});
-        Api.get('pool')
-            .then(res => res.json())
-            .then(data => {
-                console.info("data", data);
-                this.setState({pools: data, isLoading: false});
+        const poolPromise = Api.get('pool').then(res => res.json());
+        const groupPromise = Api.get('group').then(res => res.json());
 
+        Promise.all([poolPromise, groupPromise])
+            .then(data => {
+                const pools = data[0];
+                const groups = data[1];
+                console.info(pools, groups);
+                const poolList = pools.map(pool => {
+                    return {
+                        ...pool,
+                        groups: groups.filter(d=>d.pool == pool._id).length || 0
+                    }
+                })
+                this.setState({pools: poolList, isLoading: false});
+            }, err => {
+                console.error('error', err);
             });
     }
 
@@ -137,6 +147,7 @@ class PoolList extends React.Component {
                                                             <tr>
                                                                 <th className="span4">Name</th>
                                                                 <th className="span4">Address</th>
+                                                                <th>Groups</th>
                                                                 <th className="span3">Notes</th>
                                                                 <th className="span1">Functions</th>
                                                             </tr>
@@ -147,20 +158,20 @@ class PoolList extends React.Component {
                                                             {pools && pools.map((pool, i) => (<tr key={i+1}>
                                                                 <td>{pool.name}</td>
                                                                 <td>{pool.address}</td>
+                                                                <td>{pool.groups}</td>
                                                                 <td>
                                                                     {pool.notes}
                                                                 </td>
-
                                                                 <td>
-                                                                    {/* <i className="fas fa-edit" data-tip data-for={`${wallet._id}edit`} onClick={() => this.handleEditModalShow(wallet)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
-                                                                    <ReactToolTip id={`${wallet._id}edit`}>
-                                                                        <span>Update Wallet</span>
+                                                                    <i className="fas fa-edit" data-tip data-for={`${pool._id}edit`} onClick={() => this.handleEditModalShow(wallet)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
+                                                                    <ReactToolTip id={`${pool._id}edit`}>
+                                                                        <span>Update Pool</span>
                                                                     </ReactToolTip>
 
-                                                                    <i data-tip data-for={`${wallet._id}delete`}  className="fas fa-trash-alt" tooltip="delete"></i>
-                                                                    <ReactToolTip id={`${wallet._id}delete`} >
-                                                                        <span>Delete Wallet</span>
-                                                                    </ReactToolTip> */}
+                                                                    <i data-tip data-for={`${pool._id}delete`}  className="fas fa-trash-alt" tooltip="delete"></i>
+                                                                    <ReactToolTip id={`${pool._id}delete`} >
+                                                                        <span>Delete Pool</span>
+                                                                    </ReactToolTip>
                                                                 </td>
                                                             </tr>))}
                                                         </tbody>

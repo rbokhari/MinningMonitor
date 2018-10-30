@@ -1,18 +1,17 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const RigDeleteModal = ({isOpen, onHandleSubmit, onHandleClose}) => {
+const DeleteConfirmModal = ({isOpen, title, msg, onHandleSubmit, onHandleClose}) => {
     
     if (!isOpen) return (null);
     return (
         <Modal isOpen={isOpen}>
             <form onSubmit={onHandleSubmit}>
-                <ModalHeader>Miner Delete</ModalHeader>
+                <ModalHeader>{title}</ModalHeader>
                 <ModalBody>
                     <p>
-                        Are you sure you want to delete this miner ?
+                        {msg}
                     </p>
-                    
                 </ModalBody>
                 <ModalFooter>
                     <input type="submit" value="Delete" color="danger" className="btn btn-danger pull-right" />
@@ -23,5 +22,4 @@ const RigDeleteModal = ({isOpen, onHandleSubmit, onHandleClose}) => {
     );
 }
 
-
-export default RigDeleteModal;
+export default DeleteConfirmModal;

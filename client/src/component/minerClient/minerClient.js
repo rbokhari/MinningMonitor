@@ -1,6 +1,9 @@
 import React from 'react';
-import MinerClientModal from './addNewModal';
+import ReactToolTip from 'react-tooltip';
+import toastr from 'toastr';
 
+import { DeleteConfirmModal } from '../common';
+import MinerClientModal from './addNewModal';
 import Api from '../../api/Api';
 
 class MinerClient extends React.Component {
@@ -10,6 +13,7 @@ class MinerClient extends React.Component {
 
         this.state = {
             showModal: false,
+            showDeleteModal: false,
             clients: [],
             client: {
                 name: '',
@@ -25,6 +29,11 @@ class MinerClient extends React.Component {
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleModalChange = this.handleModalChange.bind(this);
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
+
+        this.handleDeleteModalClose = this.handleDeleteModalClose.bind(this);
+        this.handleDeleteModalShow = this.handleDeleteModalShow.bind(this);
+        this.handleDeleteModalSubmit = this.handleDeleteModalSubmit.bind(this);
+
     }
 
     componentDidMount() {
@@ -32,50 +41,100 @@ class MinerClient extends React.Component {
     }
 
     getData() {
-        Api.get('client')
-            .then(data => data.json())
-            .then(res => {
-                console.info('get client', res);
-                this.setState({clients: res.data});
-            }, err => console.error('error', err));
+        let clients = Api.get('client').then(d => d.json());
+        let groups = Api.get('group').then(d => d.json());
+
+        Promise.all([clients, groups])
+            .then(data => {
+                const clients = data[0].data;
+                const groups = data[1];
+                const clientsData = clients.map((c,i) => {
+                    return {
+                        ...c,
+                        groups: groups.filter(d=>d.group.minerClient == c._id).length || 0
+                    }
+                });
+                this.setState({clients: clientsData});
+            });
     }
 
     handleModalShow() {
-        this.setState((prevState, props) => ({showModal: true}));
+        this.setState((prevState, props) => ({showModal: true, client: clientClone}));
     }
 
-    handleModalClose() {
+    handleEditModalShow(client) {
+        const clientClone = Object.assign({}, client, { exec: client.execFile });
+        this.setState((prevState, props) => ({showModal: true, client: clientClone}));
+    }
+
+    handleModalClose(){
         this.setState(prevState => ({showModal: false}));
     }
-
+    
     handleModalChange(e) {
         let { client } = this.state;
-        console.info('...>', e.target.name, e.target.type);
-        if (e.target.type == 'text') {
-            client[e.target.name] = e.target.value;
-        }else if (e.target.type== 'checkbox') {
+        if (e.target.type== 'checkbox') {
             client[e.target.name] = e.target.checked ? 1 : 0;
+        } else {
+            client[e.target.name] = e.target.value;
         }
+        // if (e.target.type == 'text') {
+        //     client[e.target.name] = e.target.value;
         this.setState((prevState, props) => ({ client: client }));
     }
-
+    
     handleModalSubmit(e) {
         e.preventDefault();
         const { client } = this.state;
         console.info('client', client);
-        Api.post('client', client)
-            .then(res => {
-                this.handleModalClose();
-            }, err => {
-                console.error('error', err);
-            });
+        if (client._id) {
+            Api.put(`client/${client._id}`, client)
+                .then(res => {
+                    this.handleModalClose();
+                    this.getData();
+                }, err => {
+                    console.error('error', err);
+                });
+        } else {
+            Api.post('client', client)
+                .then(res => {
+                    this.handleModalClose();
+                    this.getData();
+                }, err => {
+                    console.error('error', err);
+                });
+        }
+    }
+    handleDeleteModalShow(client) {
+        const clientClone = Object.assign({}, client);
+        this.setState((prevState, props) => ({showDeleteModal: true, client: clientClone}));
     }
 
+    handleDeleteModalClose() {
+        this.setState(prevState => ({showDeleteModal: false}));
+    }
+    
+    handleDeleteModalSubmit(e) {
+        e.preventDefault();
+        const { client } = this.state;
+        Api.delete(`client/${client._id}`)
+            .then(res => {
+                this.getData();
+                toastr.success(`Client ${client.name} Deleted `, 'Success !');
+                this.setState(prevState => ({showDeleteModal: false}));
+                })
+                .catch(err => {
+                    toastr.error(`Unable to delete ${client.name} `, 'Error !');
+                    console.error('Delete Client', err);
+                });
+    }
+    
     render() {
-        const { showModal, client, clients } = this.state;
+        const { showModal, client, clients, showDeleteModal } = this.state;
 
         return(
             <div className="pcoded-content">
+                <DeleteConfirmModal isOpen={showDeleteModal} title="Miner Client" msg="Are you sure to delete this Client ?" onHandleSubmit={this.handleDeleteModalSubmit} onHandleClose={this.handleDeleteModalClose} />
                 <MinerClientModal isOpen={showModal} client={client} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
                 <div className="page-header">
                     <div className="page-block">
@@ -127,11 +186,11 @@ class MinerClient extends React.Component {
                                                                 <th style={{width:'10pt'}}></th>
                                                                 <th>Client Name</th>
                                                                 <th>Executable</th>
+                                                                <th>Groups</th>
                                                                 <th>R</th>
                                                                 <th>RX</th>
                                                                 <th>NV</th>
-                                                                <th>Info</th>
-                                                                <th>Remarks</th>
+                                                                <th>Functions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -139,11 +198,23 @@ class MinerClient extends React.Component {
                                                                 <td>{i+1}</td>
                                                                 <td>{client.name}</td>
                                                                 <td>{client.execFile}</td>
+                                                                <td>{client.groups}</td>
                                                                 <td>{client.isR}</td>
                                                                 <td>{client.isRx}</td>
                                                                 <td>{client.isNv}</td>
-                                                                <td>{client.info}</td>
-                                                                <td>{client.remarks}</td>
+                                                                <td>
+                                                                    <i className="fas fa-edit" data-tip data-for={`${client._id}edit`} onClick={() => this.handleEditModalShow(client)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
+                                                                    <ReactToolTip id={`${client._id}edit`}>
+                                                                        <span>Update Client</span>
+                                                                    </ReactToolTip>
+
+                                                                    {client.groups == 0 && <i  data-tip data-for={`${client._id}delete`} className="fas fa-trash-alt" onClick={() => this.handleDeleteModalShow(client)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {client.groups > 0 && <i data-tip data-for={`${client._id}delete`} className="fas fa-trash-alt" style={{cursor: 'pointer', opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
+
+                                                                    <ReactToolTip id={`${client._id}delete`} >
+                                                                        <span>Delete Client</span>
+                                                                    </ReactToolTip>
+                                                                </td>
                                                             </tr>))}
                                                         </tbody>
                                                     </table>

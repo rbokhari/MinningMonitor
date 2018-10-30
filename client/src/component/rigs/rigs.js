@@ -115,7 +115,7 @@ class Rigs extends React.Component {
 
     componentDidMount() {
         this.getData();
-        this.timerId = setInterval(this.getData, 20000);
+        this.timerId = setInterval(this.getData, 10000);
     }
 
     componentWillUnmount() {
@@ -222,7 +222,7 @@ class Rigs extends React.Component {
                                     groupName: rig.group && groups && groups.filter(c=>c.group._id==rig.group)[0].group.name,
                                     isNameEdit: false,
                                     minutes: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60),
-                                    isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : 1,
+                                    isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 1 ? Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 2 : 1 : -1,
                                     format: moment(rig.ping_time).fromNow()
                                 }
                             });
@@ -648,7 +648,9 @@ class Rigs extends React.Component {
                                                                 // style={{'backgroundColor': ((Math.max(...rig.temperatures))>75 && (Math.max(...rig.temperatures))<=85) ? '#fff8e6' : (Math.max(...rig.temperatures))>85 ? '#ffece6' : ''}}
                                                                 >
                                                                 <td>
-                                                                    <i data-tip data-for={`${rig._id}status`} className="fa fa-circle" style={{color:rig.minutes > 2 ? 'silver' : 'green'}}></i>&nbsp;
+                                                                    {rig.isOnline >= 2 && <i data-tip data-for={`${rig._id}status`} className="fa fa-circle" style={{color:'silver'}}></i>}
+                                                                    {rig.isOnline >= 1 && rig.isOnline < 2 && <i data-tip data-for={`${rig._id}status`} className="fa fa-circle" style={{color:'orange'}}></i>}
+                                                                    {rig.isOnline == -1 && <i data-tip data-for={`${rig._id}status`} className="fa fa-circle" style={{color:'green'}}></i>}
                                                                     <ReactToolTip id={`${rig._id}status`} type="info"  >
                                                                         <span>{rig.minutes > 2 ? 'offline' : 'online'}</span>
                                                                     </ReactToolTip>
@@ -723,8 +725,8 @@ class Rigs extends React.Component {
                                                                 </td>
                                                                 <td>
                                                                     <span style={{fontWeight: 'bold'}} className="text-muted" data-tip data-for={`${rig._id}uptime`}>
-                                                                        {rig.isOnline ==1 && this.formatMinerUpTime(rig.rigUpTime)}
-                                                                        {rig.isOnline == 0 && '--'}
+                                                                        {rig.isOnline == -1 && this.formatMinerUpTime(rig.rigUpTime)}
+                                                                        {rig.isOnline > 0 && '--'}
                                                                     </span>
                                                                     <ReactToolTip id={`${rig._id}uptime`} type="info"  >
                                                                         <ul>

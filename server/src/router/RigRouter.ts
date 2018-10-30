@@ -81,6 +81,11 @@ export class RigRouter {
         const appVersion = req.body.appVersion || '';
         const rigId = req.body.rigId || '';
 
+        if (rigId == '') {
+            res.status(500).json({ err : 'serial id not availabel' });
+            return;
+        }
+
         // const temperatures = req.body.temps.map(t=> t);
         // const fanSpeeds = req.body.fans.map(f => f);
 
@@ -126,8 +131,9 @@ export class RigRouter {
         //     });
     }
 
+    // TODO : Separate this api for both python files with their appropriate data
     public UpdateRig(req: Request, res: Response): void {
-        const id: string = req.params.id;
+        const rigId: string = req.params.id;
         const cards: Number = req.body.cards;
         const osName: string = req.body.osName;
         const email: string = req.body.email;
@@ -146,7 +152,7 @@ export class RigRouter {
         const wanIp = req.body.wanIp || '';
         const gpuModel = req.body.gpuModel || '';
         const appVersion = req.body.appVersion || '';
-        const rigId = req.body.rigId || '';
+        // const rigId = req.body.rigId || '';
 
         const perform_action = req.body.performAction;
 
@@ -169,23 +175,24 @@ export class RigRouter {
             memory,
             wanIp,
             gpuModel,
-            appVersion,
-            rigId
+            appVersion
+            // rigId
         };
 
         if (perform_action != 0) {
-            Action.findOneAndRemove({ $and: [ { action: perform_action }, { rig: id}]})
+            Action.findOneAndRemove({ $and: [ { action: perform_action }, { rig: rigId}]})
                 .then(res => {
 
                 })
                 .catch(err => console.error(err));
         }
 
-        Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, updRig) {
+        //Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, updRig) {
+        Rig.findOneAndUpdate( {rigId: rigId}, {$set: rig}, {new: true}, function(err, updRig) {
             if (err) res.status(400).json(err);
-            
+            console.info("Miner is update by Miner Serial Id");
             //const _rig: Rig = updatedRig;
-            Action.find({rig: id})
+            Action.find({rig: updRig._id})
                 .then(data => {
                     //const rigReturn = {...model, actions: data};
                     let rigReturn = {
@@ -197,7 +204,7 @@ export class RigRouter {
 
                     if (updRig['group']) {
                         MinerGroup.findOne({_id: updRig['group']})
-                            .populate('minerClient', 'name')
+                            .populate('minerClient', 'name execFile info')
                             .populate('pool', 'name poolAddress -_id')
                             .populate('clocktone')
                             .populate('wallet', 'name ethAddress -_id')
@@ -205,8 +212,9 @@ export class RigRouter {
                                 if (err) console.error('miner group error', err);
 
                                 console.log('group detail', gp);
-                                let config = '{"status":"ok","minerPath":"\/root\/miner\/$MinerClient\/ethdcrminer64","minerOptions":"-epool $MinerPool -ewal $MinerWallet.$MinerName -epsw x","ocCore": $MinerCore, "ocMemory":$MinerMemory, "ocPowerlimit":$MinerPowerStage, "ocTempTarget":$MinerTemperature, "ocFanSpeedMin": $MinerFanSpeed, "srrEnabled":"","srrSerial":"","srrSlot":"","ocVddc":$MinerVoltage,"ocMode":"0","ebSerial":"","LABSOhGodAnETHlargementPill":"off"}';
-                                config = config.replace('$MinerClient', gp['minerClient']['name']);
+                                //let config = '{"minerPath":"\/root\/miner\/$MinerClient\/ethdcrminer64","minerOptions":"-epool $MinerPool -ewal $MinerWallet.$MinerName -epsw x","ocCore": $MinerCore, "ocMemory":$MinerMemory, "ocPowerlimit":$MinerPowerStage, "ocTempTarget":$MinerTemperature, "ocFanSpeedMin": $MinerFanSpeed, "srrEnabled":"","srrSerial":"","srrSlot":"","ocVddc":$MinerVoltage,"ocMode":"0","ebSerial":"","LABSOhGodAnETHlargementPill":"off"}';
+                                let config = gp['minerClient']['info'] 
+                                config = config.replace('$MinerClient', gp['minerClient']['execFile']);
                                 config = config.replace('$MinerPool', gp['pool']['poolAddress']);
                                 config = config.replace('$MinerWallet', gp['wallet']['ethAddress']);
 

@@ -56,48 +56,50 @@ def init():
     os_version = ''
     host_name = socket.gethostname()
     client_email = Path("/mnt/user/email.txt") # gns_config.txt
-    while True:
-        os_serial = stats_os_serial()
-        if os_serial:   # if serial not found, don't update anything on online server
+    # while True:
+    os_serial = stats_os_serial()
+    if os_serial:   # if serial not found, don't update anything on online server
 
-            # rig_id = Path("/mnt/user/email.txt") 
-            if client_email.is_file():
-                register_email = read_email_from_file()
+        # rig_id = Path("/mnt/user/email.txt") 
+        if client_email.is_file():
+            register_email = read_email_from_file()
 
-            os_version_path = Path("/root/config.txt") 
-            if os_version_path.is_file():
-                # with open('/root/config.txt', 'r') as myfile:
-                #     data = myfile.readline()
-                f = open('/root/config.txt', 'r')
-                while True:
-                    data = f.readline()
-                    if ('osVersion=' in data):
-                        os_version = data.replace('osVersion=', '').strip()
-                        break
+        os_version_path = Path("/root/config.txt") 
+        if os_version_path.is_file():
+            # with open('/root/config.txt', 'r') as myfile:
+            #     data = myfile.readline()
+            f = open('/root/config.txt', 'r')
+            while True:
+                data = f.readline()
+                if ('osVersion=' in data):
+                    os_version = data.replace('osVersion=', '').strip()
+                    break
 
-                lan_ip = get_lan_ip()
-                wan_ip = get_wan_ip()
+            lan_ip = get_lan_ip()
+            wan_ip = get_wan_ip()
 
-                print(os_version)
-                print(register_email)
-                print(lan_ip)
-                print(wan_ip)
-                print(os_serial)
-                print(host_name)
+            # print(os_version)
+            # print(register_email)
+            # print(lan_ip)
+            # print(wan_ip)
+            # print(os_serial)
+            # print(host_name)
 
-                rig = { 'rigId': os_serial, 'email': register_email, 'ip': lan_ip, 'updatedAt': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': os_version, 'wanIp': wan_ip }
-                print(rig)
-                try:
-                    response = requests.post(uri, json=rig)
-                    # if response.status_code != requests.status_codes.codes. || response.status_code != requests.status_codes.codes.update: # 200:
-                    #     print('error occured create', response.status_code)
-                    #print('Rig: {}'.format(response.json()))
-                    #result = response.json()
-                except requests.exceptions.ConnectionError as e:
-                    print('Connection failed.', e)
-        else:
-            print('serial not found')
-        time.sleep(20)
+            rig = { 'rigId': os_serial, 'email': register_email, 'ip': lan_ip, 'updatedAt': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': os_version, 'wanIp': wan_ip }
+            # print(rig)
+            try:
+                response = requests.post(uri, json=rig)
+                # if response.status_code != requests.status_codes.codes. || response.status_code != requests.status_codes.codes.update: # 200:
+                #     print('error occured create', response.status_code)
+                #print('Rig: {}'.format(response.json()))
+                #result = response.json()
+            except requests.exceptions.ConnectionError as e:
+                print('Connection failed.', e)
+
+            print('done')
+    else:
+        print('serial not found')
+    #time.sleep(20)
 
 
 if __name__ == "__main__":

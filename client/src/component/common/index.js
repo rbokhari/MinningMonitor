@@ -6,6 +6,7 @@ import Modal from './modal';
 import NavItem from './navItem';
 import IsLoading from './isLoading';
 import ConfirmDialog from './confirmDialog';
+import DeleteConfirmModal from './deleteConfirmBox';
 
 export {
     Dashboard,
@@ -15,5 +16,6 @@ export {
     Modal,
     NavItem,
     IsLoading,
-    ConfirmDialog
+    ConfirmDialog,
+    DeleteConfirmModal
 };

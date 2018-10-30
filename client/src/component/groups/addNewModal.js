@@ -7,7 +7,7 @@ const MinerGroupModal = ({isOpen, group, clients, wallets, pools, clocktones, on
     return (
         <Modal isOpen={isOpen}>
             <form onSubmit={onHandleSubmit}>
-                <ModalHeader>{group ? 'New Group' : 'Edit Group'}</ModalHeader>
+                <ModalHeader>{group ? 'Edit Group' : 'New Group'}</ModalHeader>
                 <ModalBody>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Name:</label>
@@ -67,7 +67,7 @@ const MinerGroupModal = ({isOpen, group, clients, wallets, pools, clocktones, on
                 </ModalBody>
                 <ModalFooter>
                     <input type="submit" value="Submit" color="primary" className="btn btn-primary" />
-                    <Button color="danger" onClick={onHandleClose} >Cancel</Button>
+                    <Button color="" onClick={onHandleClose} >Cancel</Button>
                 </ModalFooter>
             </form>
         </Modal>

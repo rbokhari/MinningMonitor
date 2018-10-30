@@ -59,6 +59,7 @@ export class MinerClientRouter {
             isRx,
             isNv,
             remarks,
+            info,
             status
         });
 
@@ -80,6 +81,7 @@ export class MinerClientRouter {
         const isRx: string = req.body.rx;
         const isNv: string = req.body.nv;
         const remarks: string = req.body.remarks;
+        const info: string = req.body.info;
         const status: string = req.body.status;
 
         const client = {
@@ -89,6 +91,7 @@ export class MinerClientRouter {
             isRx,
             isNv,
             remarks,
+            info,
             status
         };
         MinerClient.findByIdAndUpdate( id, {$set: client}, {new: true}, function(err, updateClient) {

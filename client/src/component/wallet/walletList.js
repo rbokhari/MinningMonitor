@@ -1,5 +1,6 @@
 import React from 'react';
 import toastr from 'toastr';
+import ReactToolTip from 'react-tooltip';
 
 import { IsLoading } from '../common/';
 import WalletAddModal from './walletAddModal';
@@ -49,18 +50,36 @@ class WalletList extends React.Component {
     getData() {
         //toastr.info('Getting data !');
         this.setState({isLoading: true});
-        Api.get('client')
-            .then(res => res.json())
+        const groupPromise = Api.get('group').then(d=>d.json());
+        const walletPromise = Api.get('wallet').then(d=>d.json());
+
+        Promise.all([groupPromise, walletPromise])
             .then(data => {
-                this.setState({clients: data.data});
-                Api.get('wallet')
-                    .then(res => res.json())
-                    .then(wallets => {
-                        this.setState({wallets: wallets, isLoading: false});
-                    }, err => {
-                        console.error('error', err);
-                    });
+                const groups = data[0];
+                const wallets = data[1];
+                const walletList = wallets.map(d => {
+                    return {
+                        ...d,
+                        groups: groups.filter(g=>g.wallet == d._id).length || 0
+                    }
+                });
+                this.setState({wallets: walletList, isLoading: false});
+            }, err => {
+                console.error('error', err);
             });
+
+        // Api.get('client')
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         this.setState({clients: data.data});
+        //         Api.get('wallet')
+        //             .then(res => res.json())
+        //             .then(wallets => {
+        //                 this.setState({wallets: wallets, isLoading: false});
+        //             }, err => {
+        //                 console.error('error', err);
+        //             });
+        //     });
     }
 
     handleModalShow() {
@@ -142,6 +161,7 @@ class WalletList extends React.Component {
                                                             <tr>
                                                                 <th className="span4">Name</th>
                                                                 <th className="span4">Address</th>
+                                                                <th>Groups</th>
                                                                 <th className="span3">Notes</th>
                                                                 <th className="span1">Functions</th>
                                                             </tr>
@@ -152,20 +172,21 @@ class WalletList extends React.Component {
                                                             {wallets && wallets.map((wallet, i) => (<tr key={i+1}>
                                                                 <td>{wallet.name}</td>
                                                                 <td>{wallet.ethAddress}</td>
+                                                                <td>{wallet.groups}</td>
                                                                 <td>
                                                                     {wallet.notes}
                                                                 </td>
-
                                                                 <td>
-                                                                    {/* <i className="fas fa-edit" data-tip data-for={`${wallet._id}edit`} onClick={() => this.handleEditModalShow(wallet)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
+                                                                    <i className="fas fa-edit" data-tip data-for={`${wallet._id}edit`} onClick={() => this.handleEditModalShow(wallet)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
                                                                     <ReactToolTip id={`${wallet._id}edit`}>
                                                                         <span>Update Wallet</span>
                                                                     </ReactToolTip>
 
-                                                                    <i data-tip data-for={`${wallet._id}delete`}  className="fas fa-trash-alt" tooltip="delete"></i>
+                                                                    {wallet.groups == 0 && <i  data-tip data-for={`${wallet._id}delete`} className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(wallet._id)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {wallet.groups > 0 && <i data-tip data-for={`${wallet._id}delete`} className="fas fa-trash-alt" style={{cursor: 'pointer', opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
                                                                     <ReactToolTip id={`${wallet._id}delete`} >
                                                                         <span>Delete Wallet</span>
-                                                                    </ReactToolTip> */}
+                                                                    </ReactToolTip>
                                                                 </td>
                                                             </tr>))}
                                                         </tbody>

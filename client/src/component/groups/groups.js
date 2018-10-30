@@ -155,6 +155,9 @@ class Groups extends React.Component {
             name: group.name,
             notes: group.notes,
             client: group.minerClient,
+            wallet: group.wallet,
+            pool: group.pool,
+            clocktone: group.clocktone,
             config: group.configuration,
             status: group.status
         };
