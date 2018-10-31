@@ -2,7 +2,7 @@ import React from 'react';
 import toastr from 'toastr';
 import ReactToolTip from 'react-tooltip';
 
-import { IsLoading } from '../common/';
+import { IsLoading, DeleteConfirmModal } from '../common/';
 import OptionModal from './optionModal';
 
 import Api from '../../api/Api';
@@ -16,7 +16,8 @@ class OptionList extends React.Component {
         this.state = {
             isLoading: true,
             options: [],
-            showModa: false,
+            showModal: false,
+            showDeleteModal: false,
             option: {}
         };
 
@@ -24,6 +25,8 @@ class OptionList extends React.Component {
         this.handleModalChange = this.handleModalChange.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
+        this.handleEditModalShow = this.handleEditModalShow.bind(this);
+
 
         toastr.options = {
             "closeButton": true,
@@ -51,7 +54,7 @@ class OptionList extends React.Component {
 
     getData() {
         //toastr.info('Getting data !');
-        this.setState({isLoading: true});
+        this.setState({isLoading: true, options: []});
         Api.get('profileOption')
             .then(res => res.json())
             .then(data => {
@@ -68,6 +71,11 @@ class OptionList extends React.Component {
         this.setState({showModal: true});
     }
 
+    handleEditModalShow(clocktone) {
+        const clocktoneClone = {...clocktone};
+        this.setState({showModal: true, option: clocktoneClone});
+    }
+    
     handleModalClose() {
         this.setState({showModal: false});
     }
@@ -83,11 +91,11 @@ class OptionList extends React.Component {
         e.preventDefault();
         const { option } = this.state;
         console.info('option', option);
-        if (option.id) {
-            Api.put(`profileOption/${option.id}`, option)
+        if (option._id) {
+            Api.put(`profileOption/${option._id}`, option)
                 .then(res => {
-                    console.info('group post', res);
-                    toastr.success('New Option added !', 'Success !');
+                    console.info('group put', res);
+                    toastr.success('Option Updated !', 'Success !');
                     this.handleModalClose();
                     this.getData();
                 }, err => {
@@ -109,10 +117,11 @@ class OptionList extends React.Component {
 
 
     render() {
-        const { options, isLoading, showModal, option } = this.state;
+        const { options, isLoading, showModal, showDeleteModal, option } = this.state;
 
         return(
             <div className="pcoded-content">
+                <DeleteConfirmModal isOpen={showDeleteModal} title="Clocktone" msg="Are you sure to delete this Clocktone ?" onHandleSubmit={this.handleDeleteSubmit} onHandleClose={this.handleDeleteClose} />
                 <OptionModal isOpen={showModal} option={option} 
                     onHandleChange={this.handleModalChange} 
                     onHandleSubmit={this.handleModalSubmit} 
@@ -168,7 +177,7 @@ class OptionList extends React.Component {
                                                                 <td>{opt.fanSpeed}</td>
                                                                 <td>
                                                                     <i data-tip data-for={`${opt._id}label`} 
-                                                                        style={{cursor: 'pointer'}} 
+                                                                        style={{cursor: 'pointer'}} onClick={() => this.handleEditModalShow(opt)} 
                                                                         className="fas fa-edit" ></i>&nbsp;&nbsp;
                                                                     <ReactToolTip id={`${opt._id}label`}>
                                                                         <span>Modify Option</span>

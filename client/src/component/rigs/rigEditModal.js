@@ -35,7 +35,7 @@ const RigEditModal = ({isOpen, rig, groups, clocktones, onHandleChange, onHandle
                 </ModalBody>
                 <ModalFooter>
                     <input type="submit" value="Submit" color="primary" className="btn btn-primary" />
-                    <Button color="danger" onClick={onHandleClose} >Cancel</Button>
+                    <Button type="button" color="" onClick={onHandleClose} >Cancel</Button>
                 </ModalFooter>
             </form>
         </Modal>

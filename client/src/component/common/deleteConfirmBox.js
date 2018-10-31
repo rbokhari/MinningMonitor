@@ -15,7 +15,7 @@ const DeleteConfirmModal = ({isOpen, title, msg, onHandleSubmit, onHandleClose})
                 </ModalBody>
                 <ModalFooter>
                     <input type="submit" value="Delete" color="danger" className="btn btn-danger pull-right" />
-                    <Button color="default" onClick={onHandleClose} >Cancel</Button>
+                    <Button type="button" color="default" onClick={onHandleClose} >Cancel</Button>
                 </ModalFooter>
             </form>
         </Modal>

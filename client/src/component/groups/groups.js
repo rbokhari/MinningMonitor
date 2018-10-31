@@ -250,7 +250,7 @@ class Groups extends React.Component {
                                                                 <th className="span2">Notes</th>
                                                                 <th className="span1">Miners</th>
                                                                 <th className="span2">Miner Client</th>
-                                                                <th className="span4" style={{'wordWrap':'break-word'}}>Configuration</th>
+                                                                {/* <th className="span4" style={{'wordWrap':'break-word'}}>Configuration</th> */}
                                                                 <th className="span1">Functions</th>
                                                             </tr>
                                                         </thead>
@@ -264,11 +264,11 @@ class Groups extends React.Component {
                                                                 </td>
 
                                                                 <td>
-                                                                    {clients && clients.filter(c=>c._id==gp.group.minerClient)[0].name}
+                                                                    {/* {clients && clients.filter(c=>c._id==gp.group.minerClient)[0].name} */}
                                                                 </td>
-                                                                <td>
+                                                                {/* <td>
                                                                     <p>{gp.group.configuration.length > 50 ? gp.group.configuration.substring(1, 50) + '  ...' : gp.group.configuration}</p>
-                                                                </td>
+                                                                </td> */}
                                                                 <td>
                                                                     <i className="fas fa-edit" data-tip data-for={`${gp._id}edit`} onClick={() => this.handleEditModalShow(gp.group)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
                                                                     <ReactToolTip id={`${gp._id}edit`}>

@@ -35,7 +35,7 @@ export class ProfileOptionRouter {
         const core: number = req.body.core;
         const memory: number = req.body.memory;
         const voltage: number = req.body.voltage;
-        const powerStage: number = req.body.powerstage;
+        const powerStage: number = req.body.powerStage;
         const temperature: number = req.body.targetTemp;
         const fanSpeed: number = req.body.minFanSpeed;
         const notes: number = req.body.notes;
@@ -69,7 +69,7 @@ export class ProfileOptionRouter {
         const core: number = req.body.core;
         const memory: number = req.body.memory;
         const voltage: number = req.body.voltage;
-        const powerStage: number = req.body.powerstage;
+        const powerStage: number = req.body.powerStage;
         const temperature: number = req.body.targetTemp;
         const fanSpeed: number = req.body.minFanSpeed;
         const notes: number = req.body.notes;

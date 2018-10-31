@@ -30,7 +30,7 @@ const WalletAddModal = ({isOpen, wallet, onHandleChange, onHandleSubmit, onHandl
                 </ModalBody>
                 <ModalFooter>
                     <input type="submit" value="Submit" color="primary" className="btn btn-primary" />
-                    <Button color="danger" onClick={onHandleClose} >Cancel</Button>
+                    <Button color="" onClick={onHandleClose} >Cancel</Button>
                 </ModalFooter>
             </form>
         </Modal>

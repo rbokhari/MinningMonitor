@@ -2,7 +2,7 @@ import React from 'react';
 import toastr from 'toastr';
 import ReactToolTip from 'react-tooltip';
 
-import { IsLoading } from '../common/';
+import { IsLoading, DeleteConfirmModal } from '../common/';
 import PoolAddModal from './poolAddModal';
 import Api from '../../api/Api';
 
@@ -15,6 +15,7 @@ class PoolList extends React.Component {
             isLoading: true,
             pools: [],
             showModal: false,
+            showDeleteModal: false,
             pool: {}
         };
 
@@ -22,6 +23,11 @@ class PoolList extends React.Component {
         this.handleModalChange = this.handleModalChange.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
+        this.handleEditModalShow = this.handleEditModalShow.bind(this);
+
+        this.handleDeleteClose = this.handleDeleteClose.bind(this);
+        this.handleDeleteModal = this.handleDeleteModal.bind(this);
+        this.handleDeleteSubmit = this.handleDeleteSubmit.bind(this);
 
         toastr.options = {
             "closeButton": true,
@@ -47,7 +53,7 @@ class PoolList extends React.Component {
     }
 
     getData() {
-        this.setState({isLoading: true});
+        this.setState({isLoading: true, pools: []});
         const poolPromise = Api.get('pool').then(res => res.json());
         const groupPromise = Api.get('group').then(res => res.json());
 
@@ -55,7 +61,6 @@ class PoolList extends React.Component {
             .then(data => {
                 const pools = data[0];
                 const groups = data[1];
-                console.info(pools, groups);
                 const poolList = pools.map(pool => {
                     return {
                         ...pool,
@@ -70,6 +75,11 @@ class PoolList extends React.Component {
 
     handleModalShow() {
         this.setState({showModal: true});
+    }
+
+    handleEditModalShow(pool) {
+        const poolClone = {...pool};
+        this.setState({showModal: true, pool: poolClone});
     }
 
     handleModalClose() {
@@ -89,7 +99,6 @@ class PoolList extends React.Component {
         if (pool.id) {
             Api.put(`pool/${pool.id}`, pool)
                 .then(res => {
-                    console.info('group post', res);
                     toastr.success('New Pool added !', 'Success !');
                     this.handleModalClose();
                     this.getData();
@@ -99,7 +108,6 @@ class PoolList extends React.Component {
         } else {
             Api.post('pool', pool)
                 .then(res => {
-                    console.info('pool post', res);
                     toastr.success('Pool updated !', 'Success !');
                     this.handleModalClose();
                     this.getData();
@@ -110,11 +118,34 @@ class PoolList extends React.Component {
         //this.setState({showModal: false});
     }
 
+    handleDeleteModal(pool) {
+        const poolClone = {...pool}; // Object.assign({}, pool);
+        this.setState((prevState, props) => ({showDeleteModal: true, pool: poolClone}));
+    }
+
+    handleDeleteSubmit(e) {
+        e.preventDefault();
+        const { pool } = this.state;
+        this.setState(prevState => ({showDeleteModal: false}));
+        Api.delete(`pool/${pool.id}`)
+            .then(res => {
+                this.getData();
+                })
+            .catch(err => console.error('Delete Pool', err));
+    }
+
+    handleDeleteClose(e) {
+        e.preventDefault();
+        this.setState(prevState => ({showDeleteModal: false}));
+    }
+
+
     render() {
-        const { pools, isLoading, showModal, pool } = this.state;
+        const { pools, isLoading, showModal, pool, showDeleteModal } = this.state;
 
         return(
             <div className="pcoded-content">
+                <DeleteConfirmModal isOpen={showDeleteModal} title="Pool" msg="Are you sure to delete this Pool ?" onHandleSubmit={this.handleDeleteSubmit} onHandleClose={this.handleDeleteClose} />
                 <PoolAddModal isOpen={showModal} pool={pool} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
                 <div className="page-header">
                     <div className="page-block">
@@ -163,12 +194,12 @@ class PoolList extends React.Component {
                                                                     {pool.notes}
                                                                 </td>
                                                                 <td>
-                                                                    <i className="fas fa-edit" data-tip data-for={`${pool._id}edit`} onClick={() => this.handleEditModalShow(wallet)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
+                                                                    <i className="fas fa-edit" data-tip data-for={`${pool._id}edit`} onClick={() => this.handleEditModalShow(pool)} style={{cursor: 'pointer'}} ></i>&nbsp;&nbsp;
                                                                     <ReactToolTip id={`${pool._id}edit`}>
                                                                         <span>Update Pool</span>
                                                                     </ReactToolTip>
 
-                                                                    <i data-tip data-for={`${pool._id}delete`}  className="fas fa-trash-alt" tooltip="delete"></i>
+                                                                    <i data-tip data-for={`${pool._id}delete`}  className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(pool)} style={{cursor: 'pointer'}}></i>
                                                                     <ReactToolTip id={`${pool._id}delete`} >
                                                                         <span>Delete Pool</span>
                                                                     </ReactToolTip>

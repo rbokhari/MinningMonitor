@@ -82,7 +82,7 @@ export class RigRouter {
         const rigId = req.body.rigId || '';
 
         if (rigId == '') {
-            res.status(500).json({ err : 'serial id not availabel' });
+            res.status(400).json({ message : 'Serial Id not availabel !' });
             return;
         }
 
@@ -131,25 +131,27 @@ export class RigRouter {
         //     });
     }
 
+    // call from startup file only
+
     // TODO : Separate this api for both python files with their appropriate data
     public UpdateRig(req: Request, res: Response): void {
         const rigId: string = req.params.id;
         const cards: Number = req.body.cards;
-        const osName: string = req.body.osName;
-        const email: string = req.body.email;
-        const ip: string = req.body.ip;
-        const kernelName: string = req.body.kernel;
+        //const osName: string = req.body.osName;
+        //const email: string = req.body.email;
+        //const ip: string = req.body.ip;
+        //const kernelName: string = req.body.kernel;
         const totalHashrate: string = req.body.totalHashrate;
         const shares: string = req.body.t_shares;
         const invalidShares: string = req.body.i_shares;
         const singleHashrate = req.body.gpu;
-        const updatedAt = new Date();
+        //const updatedAt = new Date();
         const rigUpTime = parseInt(req.body.rigUpTime);
         const temperatures = req.body.temps.map(t=> t);
         const fanSpeeds = req.body.fans.map(f => f);
         const core = req.body.cores;
         const memory = req.body.memory;
-        const wanIp = req.body.wanIp || '';
+        //const wanIp = req.body.wanIp || '';
         const gpuModel = req.body.gpuModel || '';
         const appVersion = req.body.appVersion || '';
         // const rigId = req.body.rigId || '';
@@ -158,9 +160,9 @@ export class RigRouter {
 
         const rig = {
             cards,
-            osName,
-            ip,
-            kernelName,
+            // osName,
+            // ip,
+            // kernelName,
             totalHashrate,
             singleHashrate,
             shares,
@@ -168,12 +170,12 @@ export class RigRouter {
             status: 1,
             temperatures,
             fanSpeeds,
-            email,
-            updatedAt,
+            // email,
+            // updatedAt,
             rigUpTime,
             core,
             memory,
-            wanIp,
+            // wanIp,
             gpuModel,
             appVersion
             // rigId
@@ -211,7 +213,6 @@ export class RigRouter {
                             .exec((err, gp) => {
                                 if (err) console.error('miner group error', err);
 
-                                console.log('group detail', gp);
                                 //let config = '{"minerPath":"\/root\/miner\/$MinerClient\/ethdcrminer64","minerOptions":"-epool $MinerPool -ewal $MinerWallet.$MinerName -epsw x","ocCore": $MinerCore, "ocMemory":$MinerMemory, "ocPowerlimit":$MinerPowerStage, "ocTempTarget":$MinerTemperature, "ocFanSpeedMin": $MinerFanSpeed, "srrEnabled":"","srrSerial":"","srrSlot":"","ocVddc":$MinerVoltage,"ocMode":"0","ebSerial":"","LABSOhGodAnETHlargementPill":"off"}';
                                 let config = gp['minerClient']['info'] 
                                 config = config.replace('$MinerClient', gp['minerClient']['execFile']);
@@ -225,6 +226,13 @@ export class RigRouter {
                                     config = config.replace('$MinerTemperature', gp['clocktone']['temperature']);
                                     config = config.replace('$MinerFanSpeed', gp['clocktone']['fanSpeed']);
                                     config = config.replace('$MinerVoltage', gp['clocktone']['voltage']);
+                                } else {
+                                    config = config.replace('$MinerCore', '');
+                                    config = config.replace('$MinerMemory', '');
+                                    config = config.replace('$MinerPowerStage', '');
+                                    config = config.replace('$MinerTemperature', '');
+                                    config = config.replace('$MinerFanSpeed', '');
+                                    config = config.replace('$MinerVoltage', '');                                    
                                 }
                                 //config = config.replace('$MinerPool', )
                                 rigReturn.group = config;

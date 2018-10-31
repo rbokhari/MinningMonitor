@@ -165,7 +165,7 @@ class Rigs extends React.Component {
             .then(res => {
                 this.handleModalClose();
                 this.setState({rig: rig, actionId: 1});
-                this.setAction(rig, 2);
+                //this.setAction(rig, 2);
                 this.getData();
                 toastr.success('Name / Group changed!', 'Success !');
             })
@@ -541,7 +541,7 @@ class Rigs extends React.Component {
                                                     </div>
                                                 </div>
                                                 <div className="col">
-                                                    <h5 className="text-c-blue m-b-5">Active Miners <span className="float-right">{rigs && rigs.filter(c=>c.isOnline==1).length + ' / ' + rigs.length}</span></h5>
+                                                    <h5 className="text-c-blue m-b-5">Active Miners <span className="float-right">{rigs && rigs.filter(c=>c.isOnline==-1).length + ' / ' + rigs.length}</span></h5>
                                                     {/* <p className="m-b-0">Lorem Ipsum is simply dummy</p> */}
                                                 </div>
                                             </div>

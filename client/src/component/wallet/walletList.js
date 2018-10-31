@@ -2,7 +2,7 @@ import React from 'react';
 import toastr from 'toastr';
 import ReactToolTip from 'react-tooltip';
 
-import { IsLoading } from '../common/';
+import { IsLoading, DeleteConfirmModal } from '../common/';
 import WalletAddModal from './walletAddModal';
 import Api from '../../api/Api';
 
@@ -14,7 +14,8 @@ class WalletList extends React.Component {
         this.state = {
             isLoading: true,
             wallets: [],
-            showModa: false,
+            showModal: false,
+            showDeleteModal: false,
             wallet: {}
         };
 
@@ -22,6 +23,11 @@ class WalletList extends React.Component {
         this.handleModalChange = this.handleModalChange.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
+        this.handleEditModalShow = this.handleEditModalShow.bind(this);
+
+        this.handleDeleteClose = this.handleDeleteClose.bind(this);
+        this.handleDeleteModal = this.handleDeleteModal.bind(this);
+        this.handleDeleteSubmit = this.handleDeleteSubmit.bind(this);
 
         toastr.options = {
             "closeButton": true,
@@ -49,7 +55,7 @@ class WalletList extends React.Component {
 
     getData() {
         //toastr.info('Getting data !');
-        this.setState({isLoading: true});
+        this.setState({isLoading: true, wallets: []});
         const groupPromise = Api.get('group').then(d=>d.json());
         const walletPromise = Api.get('wallet').then(d=>d.json());
 
@@ -86,6 +92,11 @@ class WalletList extends React.Component {
         this.setState({showModal: true});
     }
 
+    handleEditModalShow(wallet) {
+        const walletClone = {...wallet, address: wallet.ethAddress}; // Object.assign({}, wallet);
+        this.setState({showModal: true, wallet: walletClone});
+    }
+
     handleModalClose() {
         this.setState({showModal: false});
     }
@@ -99,11 +110,11 @@ class WalletList extends React.Component {
     
     handleModalSubmit(e) {
         e.preventDefault();
-        const { wallet } = this.state;        
-        if (wallet.id) {
-            Api.put(`wallet/${wallet.id}`, wallet)
+        const { wallet } = this.state;
+        
+        if (wallet._id) {
+            Api.put(`wallet/${wallet._id}`, wallet)
                 .then(res => {
-                    console.info('group post', res);
                     toastr.success('New Wallet added !', 'Success !');
                     this.handleModalClose();
                     this.getData();
@@ -113,7 +124,6 @@ class WalletList extends React.Component {
         } else {
             Api.post('wallet', wallet)
                 .then(res => {
-                    console.info('wallet post', res);
                     toastr.success('Wallet updated !', 'Success !');
                     this.handleModalClose();
                     this.getData();
@@ -124,11 +134,39 @@ class WalletList extends React.Component {
         //this.setState({showModal: false});
     }
 
+    handleDeleteModal(wallet) {
+        const walletClone = Object.assign({}, wallet);
+        this.setState((prevState, props) => ({showDeleteModal: true, wallet: walletClone}));
+    }
+
+    handleDeleteSubmit(e) {
+        e.preventDefault();
+        const { wallet } = this.state;
+        this.setState(prevState => ({showDeleteModal: false}));
+        Api.delete(`wallet/${wallet._id}`)
+            .then(res => {
+                this.getData();
+                // this.refs.container.success(
+                //     "Success !",
+                //     "Miner is delete.", {
+                //     timeOut: 1000,
+                //     extendedTimeOut: 100
+                //   });
+                })
+            .catch(err => console.error('Delete Group', err));
+    }
+
+    handleDeleteClose(e) {
+        e.preventDefault();
+        this.setState(prevState => ({showDeleteModal: false}));
+    }
+
     render() {
-        const { wallets, isLoading, showModal, wallet } = this.state;
+        const { wallets, isLoading, showModal, wallet, showDeleteModal } = this.state;
 
         return(
             <div className="pcoded-content">
+                <DeleteConfirmModal isOpen={showDeleteModal} title="Wallet" msg="Are you sure to delete this Wallet ?" onHandleSubmit={this.handleDeleteSubmit} onHandleClose={this.handleDeleteClose} />
                 <WalletAddModal isOpen={showModal} wallet={wallet} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
                 <div className="page-header">
                     <div className="page-block">
@@ -182,7 +220,7 @@ class WalletList extends React.Component {
                                                                         <span>Update Wallet</span>
                                                                     </ReactToolTip>
 
-                                                                    {wallet.groups == 0 && <i  data-tip data-for={`${wallet._id}delete`} className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(wallet._id)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
+                                                                    {wallet.groups == 0 && <i  data-tip data-for={`${wallet._id}delete`} className="fas fa-trash-alt" onClick={() => this.handleDeleteModal(wallet)} style={{cursor: 'pointer'}} tooltip="delete"></i>}
                                                                     {wallet.groups > 0 && <i data-tip data-for={`${wallet._id}delete`} className="fas fa-trash-alt" style={{cursor: 'pointer', opacity: 0.5, pointerEvents: 'none'}} tooltip="delete"></i>}
                                                                     <ReactToolTip id={`${wallet._id}delete`} >
                                                                         <span>Delete Wallet</span>

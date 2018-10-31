@@ -59,7 +59,7 @@ class MinerClient extends React.Component {
     }
 
     handleModalShow() {
-        this.setState((prevState, props) => ({showModal: true, client: clientClone}));
+        this.setState((prevState, props) => ({showModal: true}));
     }
 
     handleEditModalShow(client) {
@@ -133,7 +133,7 @@ class MinerClient extends React.Component {
         const { showModal, client, clients, showDeleteModal } = this.state;
 
         return(
-            <div className="pcoded-content">
+            <div className="pcoded-content"> 
                 <DeleteConfirmModal isOpen={showDeleteModal} title="Miner Client" msg="Are you sure to delete this Client ?" onHandleSubmit={this.handleDeleteModalSubmit} onHandleClose={this.handleDeleteModalClose} />
                 <MinerClientModal isOpen={showModal} client={client} onHandleChange={this.handleModalChange} onHandleSubmit={this.handleModalSubmit} onHandleClose={this.handleModalClose} />
                 <div className="page-header">

@@ -36,13 +36,13 @@ const OptionModal = ({isOpen, option, onHandleChange, onHandleSubmit, onHandleCl
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Powerstage:</label>
                         <div className="col-sm-9">
-                            <input type="text" name="powerstage" className="form-control" value={option && option.powerstage} onChange={onHandleChange} />
+                            <input type="text" name="powerStage" className="form-control" value={option && option.powerStage} onChange={onHandleChange} />
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Target Temperature:</label>
                         <div className="col-sm-9">
-                            <input name="targetTemp" type="range" list="tickmarks" style={{width: '100%'}} min="1" max="100" step="1" value={option && option.targetTemp} onChange={onHandleChange} />
+                            <input name="targetTemp" type="range" list="tickmarks" style={{width: '100%'}} min="1" max="100" step="1" value={option && option.temperature} onChange={onHandleChange} />
                             <datalist id="tickmarks">
                                 <option value="1" label="1" />
                                 <option value="10" />
@@ -62,7 +62,7 @@ const OptionModal = ({isOpen, option, onHandleChange, onHandleSubmit, onHandleCl
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Min Fan Speed:</label>
                         <div className="col-sm-9">
-                            <input name="minFanSpeed" type="range" list="tickmarks" style={{width: '100%'}} min="1" max="100" step="1" value={option && option.minFanSpeed} onChange={onHandleChange} />
+                            <input name="minFanSpeed" type="range" list="tickmarks" style={{width: '100%'}} min="1" max="100" step="1" value={option && option.fanSpeed} onChange={onHandleChange} />
                             {/* <input type="text" name="minFanSpeed" className="form-control" value={option && option.minFanSpeed} onChange={onHandleChange} /> */}
                         </div>
                     </div>
@@ -75,7 +75,7 @@ const OptionModal = ({isOpen, option, onHandleChange, onHandleSubmit, onHandleCl
                 </ModalBody>
                 <ModalFooter>
                     <input type="submit" value="Submit" color="primary" className="btn btn-primary" />
-                    <Button color="danger" onClick={onHandleClose} >Cancel</Button>
+                    <Button type="button" color="" onClick={onHandleClose} >Cancel</Button>
                 </ModalFooter>
             </form>
         </Modal>

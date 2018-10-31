@@ -66,8 +66,8 @@ const Menu = () => (
                 <ul className="pcoded-item pcoded-left-item">
                     <li className="">
                         <NavLink to="/options" className="waves-effect waves-dark">
-                            <span className="pcoded-micon"><i className="fas fa-cog"></i></span>
-                            <span>Options</span>
+                            <span className="pcoded-micon"><i className="fas fa-clock"></i></span>
+                            <span>Clocktone</span>
                         </NavLink>
                     </li>
                 </ul>
