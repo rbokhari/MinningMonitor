@@ -1,9 +1,12 @@
 import { model, Schema } from 'mongoose';
 
 export const ActionSchema: Schema = new Schema({
+    // rig: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Rig'
+    // },
     rig: {
-        type: Schema.Types.ObjectId,
-        ref: 'Rig'
+        type: String
     },
     action: {
         type: Number

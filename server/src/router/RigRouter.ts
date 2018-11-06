@@ -24,7 +24,7 @@ export class RigRouter {
                         let rigData = data.map(d => {
                             return {
                                 ...d.toJSON(),
-                                action: actions.filter(c => (c['rig'].equals(d._id) && c['status'] == 1)).map(act => {
+                                action: actions.filter(c => (c['rig']==d['rigId'] && c['status'] == 1)).map(act => {
                                     return {
                                         actionId: act['action'],
                                         status: act['status']
@@ -194,11 +194,11 @@ export class RigRouter {
             if (err) res.status(400).json(err);
             console.info("Miner is update by Miner Serial Id");
             //const _rig: Rig = updatedRig;
-            Action.find({rig: updRig._id})
+            Action.find({rig: updRig['rigId']})
                 .then(data => {
                     //const rigReturn = {...model, actions: data};
                     let rigReturn = {
-                        rigId: updRig._id,
+                        rigId: updRig['rigId'],
                         computer: updRig['computerName'],
                         action: data,
                         group: {}
@@ -220,12 +220,12 @@ export class RigRouter {
                                 config = config.replace('$MinerWallet', gp['wallet']['ethAddress']);
 
                                 if (gp['clocktone']) {
-                                    config = config.replace('$MinerCore', gp['clocktone']['core']);
-                                    config = config.replace('$MinerMemory', gp['clocktone']['memory']);
-                                    config = config.replace('$MinerPowerStage', gp['clocktone']['powerStage']);
-                                    config = config.replace('$MinerTemperature', gp['clocktone']['temperature']);
-                                    config = config.replace('$MinerFanSpeed', gp['clocktone']['fanSpeed']);
-                                    config = config.replace('$MinerVoltage', gp['clocktone']['voltage']);
+                                    config = config.replace('$MinerCore', gp['clocktone']['core'] ? gp['clocktone']['core'] : '');
+                                    config = config.replace('$MinerMemory', gp['clocktone']['memory'] ? gp['clocktone']['memory'] : '');
+                                    config = config.replace('$MinerPowerStage', gp['clocktone']['powerStage'] ? gp['clocktone']['powerStage'] : '');
+                                    config = config.replace('$MinerTemperature', gp['clocktone']['temperature'] ? gp['clocktone']['temperature'] : '');
+                                    config = config.replace('$MinerFanSpeed', gp['clocktone']['fanSpeed'] ? gp['clocktone']['fanSpeed'] : '');
+                                    config = config.replace('$MinerVoltage', gp['clocktone']['voltage'] ? gp['clocktone']['voltage'] : '');
                                 } else {
                                     config = config.replace('$MinerCore', '');
                                     config = config.replace('$MinerMemory', '');

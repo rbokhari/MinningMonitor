@@ -165,7 +165,7 @@ class Rigs extends React.Component {
             .then(res => {
                 this.handleModalClose();
                 this.setState({rig: rig, actionId: 1});
-                //this.setAction(rig, 2);
+                this.setAction(rig, 2);
                 this.getData();
                 toastr.success('Name / Group changed!', 'Success !');
             })
@@ -304,7 +304,7 @@ class Rigs extends React.Component {
 
     setAction(rig, actionId) {
         const action = {
-            rig: rig._id,
+            rig: rig.rigId, // rig._id,
             action: actionId,
             status: 1
         };
@@ -417,12 +417,10 @@ class Rigs extends React.Component {
         this.setState({isConfirmModal: true, rig: rig, actionId: actionId});
     }
 
-    handleConfirmSubmit() {
-        
+    handleConfirmSubmit() {        
         const { rig, actionId} = this.state;
-
         const action = {
-            rig: rig._id,
+            rig: rig.rigId, //_id,
             action: actionId,
             status: 1
         };
@@ -754,7 +752,7 @@ class Rigs extends React.Component {
 
 
                                                                     <i data-tip data-for={`${rig._id}minerReset`} 
-                                                                        className={actionId== 2 && actionPosting == 1 && actionRigId == rig._id ? 'fas fa-sync-alt fa-spin' : 'fas fa-sync-alt'} 
+                                                                        className={actionId== 2 && actionPosting == 1 && actionRigId == rig.rigId ? 'fas fa-sync-alt fa-spin' : 'fas fa-sync-alt'} 
                                                                         onClick={() => this.handleConfirmModalShow(rig, 2)} 
                                                                         style={{cursor: 'pointer', color: rig.action.filter(f=>f.actionId ==2).length > 0 ? 'red' : 'black'}} >
                                                                     </i>&nbsp;&nbsp;

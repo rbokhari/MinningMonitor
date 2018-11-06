@@ -13,7 +13,7 @@ from pathlib import Path
 import platform
 
 #uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
-uri = "http://srv.gnsmining.com:3005/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+uri = "http://myserver.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
 
 APP_VERSION= '1.1.0'
 OS_VERSION=''
