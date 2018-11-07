@@ -161,7 +161,7 @@ class Rigs extends React.Component {
         // let rigs = this.state.rigs;
         // rigs[indexEdit].isNameEdit = false;
         const { rig } = this.state;
-        Api.put(`rigs/${rig._id}/name`, {'name': rig.computerName, 'group': rig.group})
+        Api.put(`rigs/${rig._id}/name`, {'name': rig.computerName, 'group': rig.group, 'clocktone': rig.clocktone })
             .then(res => {
                 this.handleModalClose();
                 this.setState({rig: rig, actionId: 1});
@@ -176,6 +176,7 @@ class Rigs extends React.Component {
 
     handleModal(rig) {
         const rigClone = Object.assign({}, rig);
+
         Api.get('group')
             .then(res => res.json())
             .then(data => {
@@ -204,10 +205,10 @@ class Rigs extends React.Component {
     }
 
     getData() {
-        Api.get('group')
-            .then(res => res.json())
-            .then(groups => {
-                this.setState({groups: groups});
+        // Api.get('group')
+        //     .then(res => res.json())
+        //     .then(groups => {
+        //         this.setState({groups: groups});
                 Api.get('rigs')
                     .then(res => res.json())
                     .then(data =>    {
@@ -219,7 +220,7 @@ class Rigs extends React.Component {
                                     totalHashrate: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 0 : rig.totalHashrate,
                                     maxTemp: 0,
                                     maxFan: 0,
-                                    groupName: rig.group && groups && groups.filter(c=>c.group._id==rig.group)[0].group.name,
+                                    //groupName: rig.group && groups && groups.filter(c=>c.group._id==rig.group)[0].group.name,
                                     isNameEdit: false,
                                     minutes: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60),
                                     isOnline: Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 1 ? Math.floor((new Date() - new Date(rig.updatedAt))/1000/60) > 2 ? 2 : 1 : -1,
@@ -233,9 +234,9 @@ class Rigs extends React.Component {
                     .catch(err => {
                         console.error('fetch error', err);
                     });
-            }, err => {
-                console.error('loading rig data error', err);
-             })
+            // }, err => {
+            //     console.error('loading rig data error', err);
+            //  })
     }
 
     // deleteRig(id) {
@@ -616,9 +617,9 @@ class Rigs extends React.Component {
                                                                     {sortBy == 'groupName' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
                                                                 </th>
                                                                 <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'notes')}>
-                                                                    Notes&nbsp;
-                                                                    {sortBy == 'notes' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
-                                                                    {sortBy == 'notes' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>}
+                                                                    Clocktone&nbsp;
+                                                                    {/* {sortBy == 'notes' && sortDirection == 1 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-down"></i>}
+                                                                    {sortBy == 'notes' && sortDirection == 0 && <i style={{opacity: 0.5}} className="fas fa-long-arrow-alt-up"></i>} */}
                                                                 </th>
                                                                 <th style={{cursor: 'pointer'}} onClick={() => this.sortByHeader(rigs, 'totalHashrate')}>
                                                                     Hashrate&nbsp;
@@ -652,6 +653,10 @@ class Rigs extends React.Component {
                                                                     <ReactToolTip id={`${rig._id}status`} type="info"  >
                                                                         <span>{rig.minutes > 2 ? 'offline' : 'online'}</span>
                                                                     </ReactToolTip>
+                                                                    <div>
+                                                                        {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                        {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    </div>
                                                                 </td>
                                                                 <td>
                                                                     <span data-tip data-for={`${rig._id}name`}>{rig.computerName}</span>
@@ -666,11 +671,12 @@ class Rigs extends React.Component {
                                                                         </ul>
                                                                     </ReactToolTip>
                                                                 </td>
-                                                                <td>{rig.groupName}</td>
+                                                                <td>{rig.group.name}</td>
                                                                 <td>
+                                                                    {rig.clocktone && rig.clocktone.label}
                                                                     {/* {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>} */}
-                                                                    {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
-                                                                    {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {/* {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>} */}
                                                                 </td>
                                                                 <td>
                                                                     <span style={{fontWeight:'bold'}} className="text-muted" data-tip data-for={`${rig._id}hashrate`}>{(rig.totalHashrate/1).toFixed(2)} MH/s</span>

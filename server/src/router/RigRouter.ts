@@ -3,8 +3,6 @@ import Rig from '../models/rig';
 import Action from '../models/action';
 import MinerGroup from '../models/minerGroup';
 
-import { parse } from 'querystring';
-
 export class RigRouter {
     router: Router;
 
@@ -16,8 +14,14 @@ export class RigRouter {
     public GetRigs(req: Request, res: Response): void {
         Rig.find()
             .sort('computerName')
-            .then(data => {
+            .populate('group')
+            .populate('clocktone')
+            .exec((err, data) => {
 
+                if (err) {
+                    console.log(err);
+                    res.status(500).json(err)
+                }
                 Action.find()
                     .then(actions => {
 
@@ -36,10 +40,10 @@ export class RigRouter {
                         res.status(200).json(rigData);
                     })
                     .catch(err => res.status(500).json(err));
-            })
-            .catch(err => {
-                res.status(500).json(err);
             });
+            // .catch(err => {
+            //     res.status(500).json(err);
+            // });
     }
     
     public GetRig(req: Request, res: Response): void {
@@ -190,11 +194,13 @@ export class RigRouter {
         }
 
         //Rig.findByIdAndUpdate( id, {$set: rig}, {new: true}, function(err, updRig) {
-        Rig.findOneAndUpdate( {rigId: rigId}, {$set: rig}, {new: true}, function(err, updRig) {
-            if (err) res.status(400).json(err);
-            console.info("Miner is update by Miner Serial Id");
+        Rig.findOneAndUpdate( {rigId: rigId}, {$set: rig}, {new: true})
+            .populate('clocktone')
+            .exec((err, updRig) => {
+                
+                if (err) res.status(400).json(err);
             //const _rig: Rig = updatedRig;
-            Action.find({rig: updRig['rigId']})
+                Action.find({rig: updRig['rigId']})
                 .then(data => {
                     //const rigReturn = {...model, actions: data};
                     let rigReturn = {
@@ -219,7 +225,15 @@ export class RigRouter {
                                 config = config.replace('$MinerPool', gp['pool']['poolAddress']);
                                 config = config.replace('$MinerWallet', gp['wallet']['ethAddress']);
 
-                                if (gp['clocktone']) {
+                                if (updRig['clocktone']) {
+                                    const _rigClocktone = updRig['clocktone'];
+                                    config = config.replace('$MinerCore', _rigClocktone['core'] ? _rigClocktone['core'] : '');
+                                    config = config.replace('$MinerMemory', _rigClocktone['memory'] ? _rigClocktone['memory'] : '');
+                                    config = config.replace('$MinerPowerStage', _rigClocktone['powerStage'] ? _rigClocktone['powerStage'] : '');
+                                    config = config.replace('$MinerTemperature', _rigClocktone['temperature'] ? _rigClocktone['temperature'] : '');
+                                    config = config.replace('$MinerFanSpeed', _rigClocktone['fanSpeed'] ? _rigClocktone['fanSpeed'] : '');
+                                    config = config.replace('$MinerVoltage', _rigClocktone['voltage'] ? _rigClocktone['voltage'] : '');
+                                } else if (gp['clocktone']) {
                                     config = config.replace('$MinerCore', gp['clocktone']['core'] ? gp['clocktone']['core'] : '');
                                     config = config.replace('$MinerMemory', gp['clocktone']['memory'] ? gp['clocktone']['memory'] : '');
                                     config = config.replace('$MinerPowerStage', gp['clocktone']['powerStage'] ? gp['clocktone']['powerStage'] : '');
@@ -257,7 +271,8 @@ export class RigRouter {
         const id: string = req.params.id;
         const name: string = req.body.name;
         const group: string = req.body.group;
-        Rig.findByIdAndUpdate( id, {$set: { 'computerName': name, 'group': group }}, {new: true}, function(err, model) {
+        const clocktone: string = req.body.clocktone;
+        Rig.findByIdAndUpdate( id, {$set: { 'computerName': name, 'group': group, 'clocktone': clocktone }}, {new: true}, function(err, model) {
             if (err) res.status(400).json(err);
             
             res.status(200).json({

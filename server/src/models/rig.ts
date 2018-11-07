@@ -95,6 +95,10 @@ export const RigSchema: Schema = new Schema({
     group: {
         type: Schema.Types.ObjectId,
         ref: 'MinerGroup'
+    },
+    clocktone: {
+        type: Schema.Types.ObjectId,
+        ref: 'ProfileOption'
     }
 });
 
