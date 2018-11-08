@@ -177,15 +177,24 @@ class Rigs extends React.Component {
     handleModal(rig) {
         const rigClone = Object.assign({}, rig);
 
-        Api.get('group')
-            .then(res => res.json())
-            .then(data => {
-                Api.get('profileOption')
-                    .then(opt => opt.json())
-                    .then(options => {
-                        this.setState((prevState, props) => ({groups: data, clocktones: options, showModal: true, rig: rigClone}));
-                    })
-            })
+        var groupsPromise = Api.get('group').then(res => res.json());
+        var clocktonesPromise = Api.get('profileOption').then(res => res.json());
+
+        Promise.all([groupsPromise, clocktonesPromise])
+            .then(docs => {
+                const groups = docs[0];
+                const clocktones = docs[1];
+
+                this.setState((prevState, props) => ({groups: groups, clocktones: clocktones, showModal: true, rig: rigClone}));
+            });
+        // Api.get('group')
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         Api.get('profileOption')
+        //             .then(opt => opt.json())
+        //             .then(options => {
+        //             })
+        //     })
     }
 
     handleModalClose() {
@@ -653,10 +662,6 @@ class Rigs extends React.Component {
                                                                     <ReactToolTip id={`${rig._id}status`} type="info"  >
                                                                         <span>{rig.minutes > 2 ? 'offline' : 'online'}</span>
                                                                     </ReactToolTip>
-                                                                    <div>
-                                                                        {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
-                                                                        {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
-                                                                    </div>
                                                                 </td>
                                                                 <td>
                                                                     <span data-tip data-for={`${rig._id}name`}>{rig.computerName}</span>
@@ -670,8 +675,12 @@ class Rigs extends React.Component {
                                                                             <li>GPU Model : {this.uniqueValues((rig.gpuModel.trim().split(',')))}</li>
                                                                         </ul>
                                                                     </ReactToolTip>
+                                                                    <div>
+                                                                        {rig.notes !== '' && <i className="fas fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                        {rig.notes == '' && <i className="far fa-sticky-note" style={{cursor: 'pointer'}} onClick={()=> this.handleNoteModal(rig)}></i>}
+                                                                    </div>
                                                                 </td>
-                                                                <td>{rig.group.name}</td>
+                                                                <td>{rig.group && rig.group.name}</td>
                                                                 <td>
                                                                     {rig.clocktone && rig.clocktone.label}
                                                                     {/* {rig.notes !== '' && <a href="#" onClick={()=> this.handleNoteModal(rig)}>{rig.notes}</a>} */}

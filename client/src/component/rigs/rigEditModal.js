@@ -6,7 +6,7 @@ const RigEditModal = ({isOpen, rig, groups, clocktones, onHandleChange, onHandle
     return (
         <Modal isOpen={isOpen}>
             <form onSubmit={onHandleSubmit}>
-                <ModalHeader>Miner {rig.computerName}</ModalHeader>
+                <ModalHeader>Miner : {rig.computerName}</ModalHeader>
                 <ModalBody>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Miner Name:</label>
@@ -17,7 +17,7 @@ const RigEditModal = ({isOpen, rig, groups, clocktones, onHandleChange, onHandle
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label">Group:</label>
                         <div className="col-sm-9">
-                            <select className="form-control" name="group" onChange={onHandleChange} defaultValue={rig.group._id}>
+                            <select className="form-control" name="group" onChange={onHandleChange} defaultValue={rig.group && rig.group._id}>
                                 <option></option>
                                 {groups && groups.map((gp,i) => (<option key={i} value={gp.group._id}>{gp.group.name}</option>))}
                             </select>
