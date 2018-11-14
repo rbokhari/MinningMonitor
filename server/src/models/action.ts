@@ -16,4 +16,11 @@ export const ActionSchema: Schema = new Schema({
     }
 });
 
+// ActionSchema.virtual('rig', {
+//     ref: 'Rig',
+//     localField: 'rig',
+//     foreignField: 'rigId',
+//     justOne: true // for many-to-1 relationships
+// });
+
 export default model('Action', ActionSchema);

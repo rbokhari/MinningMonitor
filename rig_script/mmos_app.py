@@ -26,7 +26,7 @@ host_name = socket.gethostname()
 #host_ip = socket.gethostbyname(host_name)
 wan_ip = ''
 cards = 0
-gpus = ''
+gpus = []
 temp = 0
 fan = 0
 miner_uptime = 0,
@@ -153,6 +153,7 @@ def init():
     total_shares = 0
     invalid_shares = 0
     hashrate = 0
+    gpus = []
 
     # hd_serial = stats_os_serial()
     # gpu_model = stats_gpu_model()

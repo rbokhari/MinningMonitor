@@ -40,4 +40,11 @@ export const MinerGroupSchema: Schema = new Schema({
     }
 });
 
+// MinerGroupSchema.virtual('rig', {
+//     ref: 'Rig',
+//     localField: '_id',
+//     foreignField: '_id',
+//     justOne: true // for many-to-1 relationships
+// });
+
 export default model('MinerGroup', MinerGroupSchema);
