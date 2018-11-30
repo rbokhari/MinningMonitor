@@ -99,6 +99,10 @@ export const RigSchema: Schema = new Schema({
     clocktone: {
         type: Schema.Types.ObjectId,
         ref: 'ProfileOption'
+    },
+    restart: {
+        type: Number,
+        default: 0
     }
 });
 
@@ -107,6 +111,23 @@ export const RigSchema: Schema = new Schema({
 //       this.createdAt = new Date();
 //     }
 //     next();
+// });
+
+// RigSchema.pre("save", function(next) {
+//     var self = this;
+
+//     // check for last time ping, then add restart count if its more then 2 minutes
+//     .findOne({email : this.email}, 'email', function(err, results) {
+//         if(err) {
+//             next(err);
+//         } else if(results) {
+//             console.warn('results', results);
+//             //self.invalidate("email", "email must be unique");
+//             next(new Error("email must be unique"));
+//         } else {
+//             next();
+//         }
+//     });
 // });
 
 export default model('Rig', RigSchema);

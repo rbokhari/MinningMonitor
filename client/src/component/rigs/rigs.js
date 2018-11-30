@@ -737,10 +737,17 @@ class Rigs extends React.Component {
                                                                     </ReactToolTip>
                                                                 </td>
                                                                 <td>
-                                                                    <span style={{fontWeight: 'bold'}} className="text-muted" data-tip data-for={`${rig._id}uptime`}>
-                                                                        {rig.isOnline == -1 && this.formatMinerUpTime(rig.rigUpTime)}
-                                                                        {rig.isOnline > 0 && '--'}
-                                                                    </span>
+                                                                    <ul>
+                                                                        <li>
+                                                                            <span style={{fontWeight: 'bold'}} className="text-muted" data-tip data-for={`${rig._id}uptime`}>
+                                                                                {rig.isOnline == -1 && this.formatMinerUpTime(rig.rigUpTime)}
+                                                                                {rig.isOnline > 0 && '--'}
+                                                                            </span>
+                                                                        </li>
+                                                                        <li>
+                                                                            {rig.restart}
+                                                                        </li>
+                                                                    </ul>
                                                                     <ReactToolTip id={`${rig._id}uptime`} type="info"  >
                                                                         <ul>
                                                                             <li>
@@ -753,7 +760,7 @@ class Rigs extends React.Component {
                                                                                 Last Seen : {this.formatLastSeen2(rig.updatedAt)}
                                                                             </li>
                                                                             <li>
-                                                                                Miner Restart Count : 0
+                                                                                Miner Restart Count : {rig.restart}
                                                                             </li>
                                                                         </ul>
                                                                     </ReactToolTip>

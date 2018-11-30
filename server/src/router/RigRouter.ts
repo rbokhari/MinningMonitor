@@ -66,23 +66,11 @@ export class RigRouter {
         //     });
         //     return;
         // }
-
-        // const cards: Number = req.body.cards;
         const osName: string = req.body.osName;
         const email: string = req.body.email;
         const ip: string = req.body.ip;
-        const kernelName: string = req.body.kernel;
-        // const computerName: string = req.body.worker;
-        // const totalHashrate: string = req.body.totalHashrate;
-        // const shares: string = req.body.t_shares;
-        // const invalidShares: string = req.body.i_shares;
-        // const singleHashrate = req.body.gpu;
         const updatedAt = new Date(); // req.body.updatedAt;
-        // const core = req.body.cores;
-        // const memory = req.body.memory;
         const wanIp = req.body.wanIp || '';
-        // const gpuModel = req.body.gpuModel || '';
-        const appVersion = req.body.appVersion || '';
         const rigId = req.body.rigId || '';
 
         if (rigId == '') {
@@ -90,49 +78,55 @@ export class RigRouter {
             return;
         }
 
-        // const temperatures = req.body.temps.map(t=> t);
-        // const fanSpeeds = req.body.fans.map(f => f);
-
         const rig = {
-//            cards,
             osName,
             ip,
-            // kernelName,
-            // computerName,
-            // totalHashrate,
-            // singleHashrate,
-            // shares,
-            // invalidShares,
             status: 1,
-            // temperatures,
-            // fanSpeeds,
             email,
             updatedAt,
-            // core,
-            // memory,
             wanIp,
-            rigId
-            // gpuModel,
-            // appVersion,
-            // rigId
+            rigId,
+
         };
 
-        Rig.findOneAndUpdate({rigId: rigId}, rig, {upsert: true, new: true, setDefaultsOnInsert: true})
-            .then(data => {
-                res.status(201).json(data);
-            })
-            .catch(err => {
-                console.error('error rig', err);
-            })
+        // update function
+        Rig.findOne({rigId: rigId})
+            .exec((err, data) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json(err)
+                }
 
-        // rig.save()
+                // calculation for restart factor, if more then 2 min delay it count as restart
+                const updated = data['updatedAt'];
+                let milliseconds: number = new Date().valueOf() - new Date(updated).valueOf();
+                let seconds: number = Math.floor(milliseconds / 1000);
+                let minute = Math.floor(seconds / 60);
+                // console.error('date', new Date().valueOf(), data)
+                // console.error('minutes calculated', milliseconds, seconds, minute, data['updatedAt']); 
+                if (minute > 2) {
+                    // console.error('---- Inside 2 -----')
+                    rig['restart'] = data['restart'] ? data['restart'] + 1 : 1;
+                } else {
+                    // console.error('---- Inside else -----')
+                    rig['restart'] = data['restart'] ? data['restart'] : 0;
+                }
+
+                Rig.findOneAndUpdate({rigId: rigId}, rig, {upsert: true, new: true, setDefaultsOnInsert: true})
+                    .then(data => {
+                        res.status(201).json(data);
+                    })
+                    .catch(err => {
+                        console.error('error rig', err);
+                    })
+            });
+        // Rig.findOneAndUpdate({rigId: rigId}, rig, {upsert: true, new: true, setDefaultsOnInsert: true})
         //     .then(data => {
-        //         res.status(201).json({data});
+        //         res.status(201).json(data);
         //     })
         //     .catch(err => {
-        //         console.log('error occured by creating rig', err);
-        //         res.status(500).json({ err });
-        //     });
+        //         console.error('error rig', err);
+        //     })
     }
 
     // call from startup file only

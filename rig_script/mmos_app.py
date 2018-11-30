@@ -12,17 +12,18 @@ from datetime import datetime
 from pathlib import Path
 import platform
 
-#uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
-uri = "http://myserver.gnsmining.com:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+# uri = "http://46.101.227.146:3000/api/v1/rigs" #"http://sits-002:3000/api/v1/rigs"
+# "http://sits-002:3000/api/v1/rigs"
+uri = "http://myserver.gnsmining.com:3000/api/v1/rigs"
 
-APP_VERSION= '1.1.0'
-OS_VERSION=''
+APP_VERSION = '1.1.0'
+OS_VERSION = ''
 
 # firebase = firebase.FirebaseApplication('https://genesuspool.firebaseio.com/')
 miner_ip = '127.0.0.1'
 miner_port = 3333
 host_name = socket.gethostname()
-#print(host_name)
+# print(host_name)
 #host_ip = socket.gethostbyname(host_name)
 wan_ip = ''
 cards = 0
@@ -40,33 +41,34 @@ config_email = 'test@gmail.com'
 print(APP_VERSION)
 
 def get_data():
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = (miner_ip, miner_port)
-        try:
-            sock.connect(server_address)
-        except Exception as e:
-            #print('Miner socket ' + str(miner_ip) + ':' + str(miner_port) + ' is closed')
-            print('Miner is closed, retrying !!!')
-            return []
-        request = '{\"id\":0,\"jsonrpc\":\"2.0\",\"method\":\"miner_getstat1\",\"psw\":\"''\"}'
-        request = request.encode()
-        try:
-            sock.sendall(request)
-        except Exception as e:
-            print('Sending data was aborted')
-            return []
-        try:
-            data = sock.recv(512)
-        except Exception as e:
-            print('Recieveing data was aborted')
-            return []
-        data = json.loads(data.decode('utf-8'))
-        sock.close()
-        return data
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_address = (miner_ip, miner_port)
+    try:
+        sock.connect(server_address)
+    except Exception as e:
+        #print('Miner socket ' + str(miner_ip) + ':' + str(miner_port) + ' is closed')
+        print('Miner is closed, retrying !!!')
+        return []
+    request = '{\"id\":0,\"jsonrpc\":\"2.0\",\"method\":\"miner_getstat1\",\"psw\":\"''\"}'
+    request = request.encode()
+    try:
+        sock.sendall(request)
+    except Exception as e:
+        print('Sending data was aborted')
+        return []
+    try:
+        data = sock.recv(512)
+    except Exception as e:
+        print('Recieveing data was aborted')
+        return []
+    data = json.loads(data.decode('utf-8'))
+    sock.close()
+    return data
+
 
 def avg_hashrate_1min():
     hashrates = []
-    
+
     for i in range(0, 2):
         data = get_data()
         # print('*')
@@ -85,6 +87,7 @@ def avg_hashrate_1min():
     except Exception as e:
         return 0
 
+
 def get_lan_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
@@ -92,11 +95,12 @@ def get_lan_ip():
     s.close()
     return lan_ip
 
+
 def get_wan_ip():
     import urllib.request
     with urllib.request.urlopen('http://ipinfo.io/ip') as response:
         wan_ip = response.read()
-    return wan_ip.decode("utf-8") # convert byte to string
+    return wan_ip.decode("utf-8")  # convert byte to string
 
 # def track_external_ip():
 #     """
@@ -118,6 +122,7 @@ def get_wan_ip():
 #     conn.close()
 #     return ip["ip"]
 
+
 def get_ip_address():
     # from urllib import urlopen
     import urllib.request
@@ -131,23 +136,24 @@ def get_ip_address():
     # info = urlopen(url)
     # print(info)
 
+
 def init():
     #condition = True
     wan_ip = get_wan_ip()
     hd_serial = stats_os_serial()
     gpu_model = stats_gpu_model()
 
-    #while True:
+    # while True:
     data = get_data()
     #{"result": ["7.3", "19", "16212;7;0", "16212", "0;0;0", "0", "74;30", "us1.ethermine.org:4444", "0;0;0;7"]}
-    #u'result': [u'10.6 - ETH', u'76', u'25940;31;0', u'25940', u'0;0;0', u'off', u'45;80', u'eu1.ethermine.org:4444', u'0;0;0;0']}
+    # u'result': [u'10.6 - ETH', u'76', u'25940;31;0', u'25940', u'0;0;0', u'off', u'45;80', u'eu1.ethermine.org:4444', u'0;0;0;0']}
     #{'id': 0, 'result': ['11.9 - ETH', '4332', '54611;3461;1', '26238;28373', '0;0;0', 'off;off', '39;80;44;80', 'eu1.ethermine.org:4444', '0;0;0;0'], 'error': None}
     OS_VERSION = stats_os_version()
-    cards = stats_count() # len(temps)
+    cards = stats_count()  # len(temps)
     cores = stats_core()
     memory = stats_memory()
-    temps = stats_temp() #  all[::2]
-    fans = stats_fan() # all[1::2]
+    temps = stats_temp()  # all[::2]
+    fans = stats_fan()  # all[1::2]
 
     miner_uptime = 0,
     total_shares = 0
@@ -165,9 +171,9 @@ def init():
         total_shares = int(data['result'][2].split(';')[1])
         invalid_shares = int(data['result'][8].split(';')[0])
         miner_uptime = data['result'][1]
-        
-        #temp = ';'.join(temps) #str(temps)
-        #fan = ';'.join(fans) #str(fans)
+
+        # temp = ';'.join(temps) #str(temps)
+        # fan = ';'.join(fans) #str(fans)
 
         # print('-----------------START------------------')
         #print('Number of active cards: ' + str(cards))
@@ -178,7 +184,7 @@ def init():
         # print('Total Shares : ' + str(total_shares) + '')
         # print('Invalid Shares : ' + str(invalid_shares) + '')
         # print('Calculating Hashrate ...')
-        
+
         hashrates = []
         i = 0
         #logger.info('Previous hashrate is %s ' % "{:,.2f}".format(previous_hashrate / 1000) + ' Mh/s')
@@ -199,13 +205,13 @@ def init():
     #id_file = Path("id.txt")
     action_file = Path("mmos_action.txt")
     action_perform = 0
-    client_email = Path("/mnt/user/email.txt") # gns_config.txt
+    client_email = Path("/mnt/user/email.txt")  # gns_config.txt
     if client_email.is_file():
         register_email = read_email_from_file()
 
     # if id_file.is_file():
     #id = read_id_from_file()
-    #ping_from_rig(id)
+    # ping_from_rig(id)
     #result = firebase.put('rigs', id, { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': str(temp), 'fan': str(fan), 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate, 'gpus': gpus })
     #print('Rig ping at {}'.format(datetime.now()))
     #rig = { 'email': 'py11@gmail.com', 'ip': host_ip, 'osName': 'osname', 'kernel': 'keeeeerrr', 'worker': host_name, 'cards': cards, 'temps': temps, 'fans': fans, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
@@ -221,35 +227,36 @@ def init():
     # else:
     #     rig = { 'wanIp': wan_ip, 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': 0, 'email': register_email, 'ip': lan_ip, 'serverTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'osName': OS_VERSION, 'appVersion': APP_VERSION, 'kernel': 'keeeeerrr', 'worker': lan_ip, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
 
-    #if isMinerRunning:
-    rig = { 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': miner_uptime, 'appVersion': APP_VERSION, 'cards': cards, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate }
-    #else:
+    # if isMinerRunning:
+    rig = {'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': miner_uptime, 'appVersion': APP_VERSION, 'cards': cards,
+           'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': gpus, 'totalHashrate': hashrate}
+    # else:
     #    rig = { 'gpuModel': gpu_model, 'rigId': hd_serial, 'performAction': action_perform, 'rigUpTime': 0, 'appVersion': APP_VERSION, 'cards': 0, 'temps': temps, 'fans': fans, 'cores': cores, 'memory': memory, 't_shares': 0, 'i_shares': 0, 'gpu': 0, 'totalHashrate': 0 }
-    
+
     try:
         # print(uri)
-        #print(id)
+        # print(id)
         # print(rig)
         response = requests.put(uri + '/' + hd_serial, json=rig)
-        if response.status_code != requests.codes.ok: # 201:
+        if response.status_code != requests.codes.ok:  # 201:
             print('error occured update', response.status_code)
-        #if response.status_code == requests.codes.ok: # 201:
+        # if response.status_code == requests.codes.ok: # 201:
             #print('Updated Rig. ID: {}'.format(response.json()))
-        
+
         result = response.json()
         comp_name = result['rigReturn']['computer']
-        #save_name_to_file(comp_name)
+        # save_name_to_file(comp_name)
         actions = result['rigReturn']['action']
         if len(actions) > 0:
             execute_actions(actions)
-            time.sleep(15) 
+            time.sleep(15)
 
         group = result['rigReturn']['group']
         if (len(group)):
-            # configuration = str(group['configuration']).replace('$MinerName', comp_name) 
-            configuration = str(group).replace('$MinerName', comp_name) 
+            # configuration = str(group['configuration']).replace('$MinerName', comp_name)
+            configuration = str(group).replace('$MinerName', comp_name)
             save_group_config_to_file(configuration)
-            
+
     except requests.exceptions.ConnectionError as e:
         print('Connection failed.')
         #raise ApiError('POST /tasks/ {}'.format(result.status_code))
@@ -266,11 +273,11 @@ def init():
     #         #save_id_to_file(result['data']["_id"])
     #     except requests.exceptions.ConnectionError as e:
     #         print('Connection failed.')
-            #raise ApiError('POST /tasks/ {}'.format(result.status_code))
+        #raise ApiError('POST /tasks/ {}'.format(result.status_code))
         #result = firebase.post('rigs', { 'email': 'py11@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now(), 'cards': cards, 'temp': temp, 'fan': fan, 't_shares': total_shares, 'i_shares': invalid_shares, 'gpu': hashrate })
         #print('Rig registered at {}'.format(datetime.now()))
 
-        #time.sleep(15)
+        # time.sleep(15)
         #condition = False
 
 # online registering
@@ -288,9 +295,9 @@ def init():
 #     print(response)
 #     return response
 
-#def ping_from_rig(id):
+# def ping_from_rig(id):
     #result = firebase.put('rigs', id, { 'email': 'py_update@gmail.com', 'ip': host_ip, 'worker': host_name, 'ping_time': datetime.now() })
-    #return result
+    # return result
 
 # def save_id_to_file(id):
 #     f = open("id.txt", "w+")
@@ -301,6 +308,7 @@ def init():
 #     f = open("name.txt", "w+")
 #     f.write(name)
 #     f.close()
+
 
 def save_group_config_to_file(config):
     p = Path("/home/miner/config.json")
@@ -320,17 +328,20 @@ def save_group_config_to_file(config):
     time.sleep(20)
     os.system('./miner_restart.sh')
 
+
 def read_id_from_file():
     f = open("id.txt", "r")
     id = f.read()
     f.close()
     return id
 
+
 def read_email_from_file():
     f = open("/mnt/user/email.txt", "r")
     email = f.read()
     f.close()
     return email
+
 
 def stats_core():
     f = Path("/var/tmp/stats_gpu_core")
@@ -344,6 +355,7 @@ def stats_core():
         return cores
     return []
 
+
 def stats_memory():
     f = Path("/var/tmp/stats_gpu_memory")
     if f.is_file():
@@ -355,6 +367,7 @@ def stats_memory():
         #memory = map(int, memory)
         return memory
     return []
+
 
 def stats_fan():
     f = Path("/var/tmp/stats_gpu_fanspeed")
@@ -368,6 +381,7 @@ def stats_fan():
         return fans
     return []
 
+
 def stats_temp():
     f = Path("/var/tmp/stats_gpu_temp")
     if f.is_file():
@@ -380,6 +394,7 @@ def stats_temp():
         return temps
     return []
 
+
 def stats_count():
     f = Path("/var/tmp/stats_gpu_count")
     if f.is_file():
@@ -388,6 +403,7 @@ def stats_count():
         d.close()
         return counts
     return 0
+
 
 def stats_os_version():
     f = Path("/var/tmp/stats_os_version")
@@ -398,6 +414,7 @@ def stats_os_version():
         return version
     return 'No Version Found'
 
+
 def stats_os_serial():
     f = Path("/var/tmp/stats_os_serial")
     if f.is_file():
@@ -407,6 +424,7 @@ def stats_os_serial():
         return serial
     return 'No Serial Found'
 
+
 def stats_gpu_model():
     f = Path("/var/tmp/stats_gpu_model")
     if f.is_file():
@@ -415,6 +433,7 @@ def stats_gpu_model():
         d.close()
         return model
     return 'No Model Found'
+
 
 def execute_actions(actions):
     if len(actions) > 0:
@@ -435,8 +454,10 @@ def execute_reboot():
     time.sleep(15)
     run_reboot()
 
-def run_reboot():    
+
+def run_reboot():
     os.system('apps/force_reboot.sh')
+
 
 def execute_miner_reset():
     f = open("mmos_action.txt", "w+")
@@ -445,6 +466,7 @@ def execute_miner_reset():
     time.sleep(10)
     os.system('./miner_restart.sh')
 
+
 if __name__ == '__main__':
     init()
-    #get_ip_address()
+    # get_ip_address()
