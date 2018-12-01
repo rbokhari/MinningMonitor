@@ -96,20 +96,18 @@ export class RigRouter {
                     console.error(err);
                     res.status(500).json(err)
                 }
-
-                // calculation for restart factor, if more then 2 min delay it count as restart
-                const updated = data['updatedAt'];
-                let milliseconds: number = new Date().valueOf() - new Date(updated).valueOf();
-                let seconds: number = Math.floor(milliseconds / 1000);
-                let minute = Math.floor(seconds / 60);
-                // console.error('date', new Date().valueOf(), data)
-                // console.error('minutes calculated', milliseconds, seconds, minute, data['updatedAt']); 
-                if (minute > 2) {
-                    // console.error('---- Inside 2 -----')
-                    rig['restart'] = data['restart'] ? data['restart'] + 1 : 1;
-                } else {
-                    // console.error('---- Inside else -----')
-                    rig['restart'] = data['restart'] ? data['restart'] : 0;
+                if (data) {                
+                    // calculation for restart factor, if more then 2 min delay it count as restart
+                    const updated = data['updatedAt'];
+                    let milliseconds: number = new Date().valueOf() - new Date(updated).valueOf();
+                    let seconds: number = Math.floor(milliseconds / 1000);
+                    let minute = Math.floor(seconds / 60);
+                    // console.error('date', new Date().valueOf(), data)
+                    // console.error('minutes calculated', milliseconds, seconds, minute, data['updatedAt']); 
+                    if (minute > 2) {
+                        // console.error('---- Inside 2 -----')
+                        rig['restart'] = data['restart'] ? data['restart'] + 1 : 1;
+                    } 
                 }
 
                 Rig.findOneAndUpdate({rigId: rigId}, rig, {upsert: true, new: true, setDefaultsOnInsert: true})
