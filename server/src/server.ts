@@ -23,13 +23,13 @@ class Server {
     public config() {
         //use q promises
         global.Promise = require("q").Promise;
-        //mongoose.Promise = global.Promise;
-
-        
+        //mongoose.Promise = global.Promise;        
         // setup mongoose
         const MONGO_URI = config.mongoDBAddress;
         try{
-            mongoose.connect(MONGO_URI || process.env.MONGODB_URI);
+            mongoose.connect(MONGO_URI || process.env.MONGODB_URI, {
+                useNewUrlParser: true
+            });
             console.log('mongoose connect');
         }catch(ex) {
             console.log('error', ex);

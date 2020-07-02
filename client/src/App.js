@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-
 //import logo from './logo.svg';
 //import './App.css';
 import Routes from './Routes';
 import { Header, Menu } from './component/common';
 
 class App extends Component {
-
     constructor(props) {
         super(props);
-        //$('[data-toggle="tooltip"]').tooltip();
     }
 
     render() {

@@ -7,7 +7,8 @@
     "ts": "tsc -w",
     "server": "nodemon ./build/index.js",
     "start": "node ./build/index.js",
-    "ts:watch": "tsc -w"
+    "ts:watch": "tsc -w",
+    "build": "NODE_ENV=production node index"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +21,7 @@
     "express": "^4.16.3",
     "helmet": "^3.13.0",
     "method-override": "^2.3.10",
-    "mongoose": "^5.2.1",
+    "mongoose": "^5.9.19",
     "morgan": "^1.9.0",
     "q": "^1.5.1"
   },

@@ -1,0 +1,23 @@
+version: '3.4'
+networks:
+        rigs_network:
+                driver: bridge
+services:
+        server:
+                image: rbokhari/rig-api
+                container_name: rig_api
+                ports:
+                        -  "8001:80"
+                networks:
+                        - rigs_network
+        web:
+                image: rbokhari/rig-web
+                container_name: rigs_web
+                environment:
+                        -  RIG_SERVER=server
+                ports:
+                        -  "8003:80"
+                networks:
+                        - rigs_network
+                depends_on:
+                        - server

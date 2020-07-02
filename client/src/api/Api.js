@@ -1,6 +1,8 @@
-//import axios from 'vue-resource';
+//const API_URL =  'http://myserver.gnsmining.com:3000/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
 
-const API_URL =  'http://myserver.gnsmining.com:3000/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
+//const API_URL = `http://${process.env.RIG_SERVER}/api/v1/`; //  'http://localhost:8001/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
+// const API_URL = `http://localhost:8001/api/v1/`; //  'http://localhost:8001/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
+const API_URL = `https://rigs-api.rbokhari.com/api/v1/`; //  'http://localhost:8001/api/v1/'; // 'http://46.101.227.146:3000/api/v1/'; // 'http://192.168.1.2:3090';  
 
 class Api {
     
